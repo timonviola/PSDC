@@ -6,15 +6,16 @@ be clarified in comments.
 
 # Version control
 * Github is the preferred version-control system
-* Guidlines of (https://www.conventionalcommits.org/en/v1.0.0/)[conventional commits]
+* Guidlines of [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
     are followed.
 
 ## Versioning
-Use semantic versioning (https://semver.org/)[https://semver.org/]
-
+Use semantic versioning [https://semver.org/](https://semver.org/)
 # Naming convention
-Classes     - PascalCase
-Functions   - PascalCase
-Scripts     - snake_case
-Variables   - camelCase
-Constants   -   UPPER_CASE_SNAKE_CASE
+<pre>
++ Classes   - PascalCase
++ Functions - PascalCase
++ Scripts   - snake_case
++ Variables - camelCase
++ Constants - UPPER_CASE_SNAKE_CASE
+</pre>
