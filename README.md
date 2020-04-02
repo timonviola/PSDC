@@ -1,4 +1,5 @@
-[![license](https://img.shields.io/github/license/timonviola/PSDC.svg?style=flat-square)](https://github.com/timonviola/PSDC/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/timonviola/PSDC.svg?style=flat-square)](./LICENSE)
+
 [![GitHub issues](https://img.shields.io/github/issues/timonviola/PSDC)](https://github.com/timonviola/PSDC/issues)
 # PSDC
 Power System Data set Creation
