@@ -1,3 +1,4 @@
+![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/timonviola/PSDC?include_prereleases&sort=semver)
 [![license](https://img.shields.io/github/license/timonviola/PSDC.svg?style=flat-square)](./LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/timonviola/PSDC)](https://github.com/timonviola/PSDC/issues)
 
