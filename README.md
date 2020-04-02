@@ -1,7 +1,8 @@
-![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/timonviola/PSDC?include_prereleases&sort=semver)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/timonviola/PSDC)
 [![license](https://img.shields.io/github/license/timonviola/PSDC.svg?style=flat-square)](./LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/timonviola/PSDC)](https://github.com/timonviola/PSDC/issues)
-
+![semver](https://img.shields.io/badge/semver-2.0.0-blue)
+ 
 # PSDC
 Power System Data set Creation
 
