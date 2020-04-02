@@ -1,0 +1,9 @@
+*.asv
+*.zip
+*.m~$
+
+diary
+logFile
+Output*
+log/
+figures/
