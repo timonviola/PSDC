@@ -1,6 +1,8 @@
 *.asv
 *.zip
 *.m~$
+ERROR*
+output*
 
 diary
 logFile
