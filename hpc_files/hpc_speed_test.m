@@ -7,12 +7,12 @@
 %   + https://www.hpc.dtu.dk/?page_id=2939 - MATLAB Parallel Server configuration on the LSF clusters
 
 clust=parcluster(dccClusterProfile());    % load the default cluster profile
-numw=32;    % Exactly the number of nodes times the number of processors per cores requested
+%numw=32;    % Exactly the number of nodes times the number of processors per cores requested
 
 SEIG = 1e3;
 
-p = parpool(clust, numw) %#ok
-disp(p)                     % log the actual state of the pool
+%p = parpool(clust, numw) %#ok
+%disp(p)                     % log the actual state of the pool
 
 execTime = nan(7,1);
 
