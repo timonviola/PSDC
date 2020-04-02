@@ -20,49 +20,49 @@ execTime = nan(7,1);
 numw = 1;
 p = parpool(clust, numw) %#ok
 disp(p)
-execTime(1) = hpc_eig_test(SEIG);
+execTime(1) = hpcEigTest(SEIG);
 delete(p)
 
 % 2 workers
 numw = 2;
 p = parpool(clust, numw) %#ok
 disp(p)
-execTime(2) = hpc_eig_test(SEIG);
+execTime(2) = hpcEigTest(SEIG);
 delete(p)
 
 % 4 workers
 numw = 4;
 p = parpool(clust, numw) %#ok
 disp(p)
-execTime(3) = hpc_eig_test(SEIG);
+execTime(3) = hpcEigTest(SEIG);
 delete(p)
 
 % 8 workers
 numw = 8;
 p = parpool(clust, numw) %#ok
 disp(p)
-execTime(4) = hpc_eig_test(SEIG);
+execTime(4) = hpcEigTest(SEIG);
 delete(p)
 
 % 16 workers
 numw = 16;
 p = parpool(clust, numw) %#ok
 disp(p)
-execTime(5) = hpc_eig_test(SEIG);
+execTime(5) = hpcEigTest(SEIG);
 delete(p)
 
 % 32 workers
 numw = 32;
 p = parpool(clust, numw) %#ok
 disp(p)
-execTime(6) = hpc_eig_test(SEIG);
+execTime(6) = hpcEigTest(SEIG);
 delete(p)
 
 % 64 workers
 numw = 64;
 p = parpool(clust, numw) %#ok
 disp(p)
-execTime(7) = hpc_eig_test(SEIG);
+execTime(7) = hpcEigTest(SEIG);
 delete(p)
 
 save([mfilename '.mat'],'execTime')
