@@ -6,6 +6,10 @@ function varargout = damp_(As)
 %   w_n - undamped natural frequency
 %   zeta- damping ratios
 %   p   - poles, in case eigenvalues
+% Dependecies (Tested version):
+%   MATLAB                      (9.8)
+%   Control System Toolbox      (14.0)
+
 
     try
         [wn,zeta,p] = damp(As);
