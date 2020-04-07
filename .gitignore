@@ -3,6 +3,8 @@
 *.m~$
 ERROR*
 output*
+fm_call.m
+
 
 diary
 logFile
