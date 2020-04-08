@@ -7,6 +7,8 @@
 % * calculate eigen properties
 % * plot
 
+clear
+util.add_dependencies
 %% Initilize PSAT instance
 fprintf(pad('Initializing PSAT',50,'right','.'))
 ps = psat('command_line_psat',true,'nosplash',true);
