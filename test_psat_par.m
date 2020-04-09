@@ -1,6 +1,7 @@
 % Script to test parallel execution of PSAT operations such as power-flow
 % or eigenvalue calculations
 
+util.add_dependencies % add PSAT and MATPOWER to path
 
 %% Set up cluster
 clust=parcluster(dccClusterProfile());    % load the default cluster profile
@@ -16,7 +17,7 @@ end
 p.addAttachedFiles([pwd filesep 'd_009_dyn.m']);
 
 %% Pre-allocate
-N = 1e4;
+N = 1e6;
 nCol = 11;
 dom = [-200 200];
 spaceGrid = lhsdesign(N,nCol);
@@ -46,5 +47,6 @@ parfor i =1:N
     Asys{i} = ps.LA.a; 
 end
 
-
-save([mfilename num2str(N) '.mat'],'Asys','spaceGrid')
+fprintf('Saving file to: %s\n',pwd) 
+fprintf('Saving file: %s\n',[mfilename strrep(sprintf('%.2g',N),'+','') '.mat'])
+save([mfilename strrep(sprintf('%.2g',N),'+','') '.mat'],'Asys','spaceGrid')
