@@ -1,6 +1,7 @@
 *.asv
 *.zip
 *.m~$
+*.out
 ERROR*
 output*
 fm_call.m
