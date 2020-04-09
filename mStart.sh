@@ -7,4 +7,4 @@
 #BSUB -o out_dataSet_%J.txt
 #BSUB -e Error_%J.txt
 #BUSB -W 00:10
-matlab -nodisplay -nosplash -nodesktop -r "addpath(genpath('~/thesis/matpower6.0/')); addpath(genpath('~/thesis/psat/'));run('~/thesis/software/testo');exit;"
+matlab -nodisplay -nosplash -nodesktop -r "run('~/thesis/PSDC/test_psat_par.m');exit;"
