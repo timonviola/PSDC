@@ -15,9 +15,9 @@ ps = psat('command_line_psat',true,'nosplash',true);
 fprintf('SUCCESSFUL\n')
 
 % do not display opf message in cmw (e.g.: pf details)
-ps.clpsat.mesg = 0;
-% do not reload data file on pf run
-ps.clpsat.readfile = 0;
+% ps.clpsat.mesg = 0;
+% % do not reload data file on pf run
+% ps.clpsat.readfile = 0;
 
 %% Load case, power-flow
 caseName = 'd_009_dyn';

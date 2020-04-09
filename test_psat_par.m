@@ -8,15 +8,22 @@ numw = 64;
 p = parpool(clust, numw);
 disp(p)
 
-%% Voltage vector
+if ispc
+    p.addAttachedFiles('c:\Users\Timon\myPSAT\psat\');
+else
+    p.addAttachedFiles('~/thesis/psat/');
+end
+p.addAttachedFiles([pwd filesep 'd_009_dyn.m']);
+
+%% Pre-allocate
 N = 1e4;
 nCol = 11;
 dom = [-200 200];
 spaceGrid = lhsdesign(N,nCol);
-spaceGrid = spaceGrid.*diff(dom)+dom(1);
+spaceGrid = spaceGrid.*diff(dom)+dom(1);    % Generator set points
 
-voltages = cell(N,1);
-Asys = cell(N,1);
+voltages = cell(N,1);       % voltages
+Asys = cell(N,1);           % system matrices
 
 %% PSAT
 
@@ -40,4 +47,4 @@ parfor i =1:N
 end
 
 
-save([mfilename N '.mat'],'Asys','spaceGrid')
+save([mfilename num2str(N) '.mat'],'Asys','spaceGrid')
