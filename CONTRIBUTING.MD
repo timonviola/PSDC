@@ -14,7 +14,7 @@ Use semantic versioning [https://semver.org/](https://semver.org/)
 # Naming convention
 <pre>
 + Classes   - PascalCase
-+ Functions - PascalCase
++ Functions - camelCase
 + Scripts   - snake_case
 + Variables - camelCase
 + Constants - UPPER_CASE_SNAKE_CASE
