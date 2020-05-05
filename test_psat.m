@@ -8,7 +8,9 @@
 % * plot
 
 clear
-util.add_dependencies
+if ~ispc
+    util.add_dependencies
+end
 %% Initilize PSAT instance
 fprintf(pad('Initializing PSAT',50,'right','.'))
 ps = psat('command_line_psat',true,'nosplash',true);
@@ -20,9 +22,12 @@ fprintf('SUCCESSFUL\n')
 % ps.clpsat.readfile = 0;
 
 %% Load case, power-flow
+caseFolder = [pwd filesep 'case_files' filesep];
 caseName = 'd_009_dyn';
+
 fprintf(pad(['Load case ' caseName],50,'right','.'))
-ps.runpsat(caseName,'data');
+% ps.runpsat(caseName,caseFolder,'/case_files/','data');
+ps.runpsat('psat_case14_results_2020_04_22T214939Z','data');
 fprintf('SUCCESSFUL\n')
 
 fprintf(pad('Run power-flow',50,'right','.'))
