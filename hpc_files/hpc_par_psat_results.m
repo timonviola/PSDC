@@ -82,14 +82,27 @@ datetick('x',timeFormat)
 ax.YScale = 'log';
 ax.YAxis.Limits = [5 1.2*1e5];
 ax.YGrid = 'on';
-legend('Location','southeast')
-xlabel('Duration')
+l = legend('Location','southeast');
+xlabel('Duration (HH:MM:SS)')
+ax.XLabel.FontSize = 9;
 ylabel('Number of points')
 ax.TickDir = 'out';
+ax.YMinorTick = 'off';
+ax.YTick = y;
 hold on 
 %
 % limits 1e2 - 1e5
 vx = linspace(1e2,1e5,100);
 vy = interp1(y,x,vx,'linear');
-plot(vy,vx,':.','DisplayName','linear interpolation')
+plot(vy,vx,':.','DisplayName','interpolation')
 
+l.ItemHitFcn = @legendCallback;
+
+function legendCallback(src,evnt)
+% Toggle legend item visibility
+if strcmp(evnt.Peer.Visible,'on')
+    evnt.Peer.Visible = 'off';
+else
+    evnt.Peer.Visible = 'on';
+end
+end
