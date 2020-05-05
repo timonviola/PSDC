@@ -12,6 +12,9 @@ parse(p,limit,varargin{:});
 limit = p.Results.limit;
 axh = p.Results.axh;
 
+% preserve yLimits
+yLimits = axh.YLim;
+
 d = limit * 100;
 y = @(x) x*(sqrt(1e4-d^2)/d);
 
@@ -22,6 +25,7 @@ defaultAxesStyle = {'LineStyle','--',...
 ph(1) = plot(xv,y(xv),defaultAxesStyle{:});
 ph(2) = plot(xv,-1*y(xv),defaultAxesStyle{:});
 
+axh.YLim = yLimits;
 if nargout
     varargout{1} = ph;
 end

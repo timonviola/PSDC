@@ -48,13 +48,13 @@ if(decorators)
     title('Eigenvalue analisys')
     xlabel('Real Axis')
     ylabel('Imginary Axis')
-
-    defaultAxesStyle = {'LineStyle',':',...
-        'Color','0.65,0.65,0.65',...
-        'HandleVisibility','off'};
-    l.x = yline(0,defaultAxesStyle{:});
-    l.y = xline(0,defaultAxesStyle{:});
 end
+defaultAxesStyle = {'LineStyle',':',...
+    'Color','0.65,0.65,0.65',...
+    'HandleVisibility','off'};
+l.x = yline(0,defaultAxesStyle{:});
+l.y = xline(0,defaultAxesStyle{:});
+
 
 if(class(lambda) == "double")
     sh = scatter(real(lambda),imag(lambda),scatterParams{:});

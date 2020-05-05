@@ -16,9 +16,16 @@ function varargout = damp_(As)
     catch e
         switch e.identifier
             case 'MATLAB:eig:matrixWithNaNInf'
-                As(isnan(As)) = 0;
+                if sum(any(isnan(As)))
+                    As(isnan(As)) = 0;
+                    warning('NaN replaced with 0.')
+                end
+                if sum(any(isinf(As)))
+                    As(isinf(As) & As > 0) = 1e40;
+                    As(isinf(As) & As < 0) = -1e40;
+                    warning('Inf replaced with 1e40.')
+                end
                 [wn,zeta,p] = damp(As);
-                warning('NaN replaced with 0.')
             otherwise
                 rethrow(e)
         end
