@@ -6,6 +6,7 @@ ERROR*
 output*
 fm_call.m
 
+.data/
 _tmp/
 diary
 logFile
