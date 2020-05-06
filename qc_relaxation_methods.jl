@@ -38,6 +38,7 @@ function get_pol_volume()
     vol = rcopy(R"volume(P)")
     return vol::Number
 end
+# ================ module end ===============================
 
 function get_header_names(variables::AbstractArray)
     header = [] # used as header in x_opt results csv
@@ -45,29 +46,36 @@ function get_header_names(variables::AbstractArray)
     header = map((x) -> uppercase(replace(x, r"0_|\[|\]" => "")),header[1]) # prettify
     return [header]::AbstractArray
 end
-# ================ module end ===============================
 
-function run_qc_relax(pm, number_of_iterations)
+function get_slack_idx(power_model::AbstractPowerModel)
+    # Slack type == 3
+    bus_idx =  [k for (k,v) in power_model.data["bus"] if v["bus_type"] == 3]
+    bus_idx = parse(Int64,bus_idx[1])
+    gen_idx = [k for (k,v) in power_model.data["gen"] if v["gen_bus"] == bus_idx]
+    return parse(Int64, gen_idx[1])
+end
+
+function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer)
     """ Iteratively solve modified QC-AC-OPF
     inputs: power model and number of iterations"""
     # Initialize variables
     start = time();
     info(logger,"QC relaxation tolerance set to $TOLERANCE .")
     optimal_setpoints = []
+    vars = []
     # build optimization problem
     # get variables: PG\{slack} and Vm (all generators)
-    # slack is not defined in "data" dict
+    # slack: bus_type == 3
     #
     # to get all: vars = [pm.var[:nw][0][:pg].data; pm.var[:nw][0][:vm].data];
     #
-    slack = 1
-    gen_indexes = map(x -> x["gen_bus"], values(pm.data["gen"]))
-    vars = []
+    slack_gen_idx = get_slack_idx(pm)
     for i=1:length(pm.var[:nw][0][:pg].data)
-        if i != slack
+        if i != slack_gen_idx
             push!(vars, JuMP.variable_by_name(pm.model, string("0_pg[",i,"]")))
         end
     end
+    gen_indexes = map(x -> x["gen_bus"], values(pm.data["gen"]))
     for g in gen_indexes
         push!(vars, JuMP.variable_by_name(pm.model, string("0_vm[",g,"]")))
     end
