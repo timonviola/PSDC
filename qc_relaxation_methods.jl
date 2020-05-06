@@ -51,36 +51,6 @@ function get_volume(N,A_j,b_j)
     return rcopy(rSTDO)
 end
 
-function sample_Rpoints(N,A_j=[],b_j=[])
-    """Uniform sampling from a convex polytope using R-volesti lib"""
-    if (isempty(A_j))
-        rSTDO = R"""
-            library(volesti)
-            A <- rbind(diag($N), -diag($N))
-            b <- cbind(matrix(1,1,$N), matrix(0,1,$N))
-            P = Hpolytope$new(A,b)
-            sample_points(P,N=1)
-        """
-        A_j = rcopy(R"A")
-        b_j = rcopy(R"b")
-        return rcopy(rSTDO), A_j, b_j
-    else
-        try
-            @debug "before sampling points" #### THIS IS WHERE THE FUNCTION FAILS
-            rSTDO = R"""
-                library(volesti)
-                A <- matrix(unlist($A_j), ncol = $N, byrow=TRUE)
-                b <- c(unlist($b_j))
-                P = Hpolytope$new(A,b)
-                sample_points(P,N=1)
-            """
-            return rcopy(rSTDO)
-        catch e
-            @debug typeof(e)
-            @debug e
-        end
-    end
-end
 
 function run_qc_relax(pm, number_of_iterations)
     """ Iteratively solve modified QC-AC-OPF
