@@ -38,6 +38,13 @@ function get_pol_volume()
     vol = rcopy(R"volume(P)")
     return vol::Number
 end
+
+function get_header_names(variables::AbstractArray{VariableRef})
+    header = [] # used as header in x_opt results csv
+    push!(header, JuMP.name.(variables))
+    header = map((x) -> uppercase(replace(x, r"0_|\[|\]" => "")),header[1]) # prettify
+    return [header]::AbstractArray
+end
 # ================ module end ===============================
 
 function run_qc_relax(pm, number_of_iterations)
@@ -46,8 +53,12 @@ function run_qc_relax(pm, number_of_iterations)
     # Initialize variables
     start = time();
     info(logger,"QC relaxation tolerance set to $TOLERANCE .")
+    optimal_setpoints = []
     # build optimization problem
     vars = [pm.var[:nw][0][:pg].data; pm.var[:nw][0][:vm].data];
+    # extract header names
+    header = get_header_names(vars) # call before normalization
+
     N = length(vars);
     nFactor = JuMP.upper_bound.(vars)
     # auxiliary variables to bridge AffExpr <-> NLconstraint
@@ -75,6 +86,7 @@ function run_qc_relax(pm, number_of_iterations)
         x_opt = JuMP.value.(vars);
         n_normT = transpose(x_opt[:] - x_hat); # This can be simply -> objective_value(pm.model) NO, in the article that is not abs() but l^1 norm
         debug(logger,string("Objective_value: " ,JuMP.value(r)))
+        push!(optimal_setpoints, (x_opt[:] .* nFactor)' )
 
         if !(isapprox(JuMP.value(r), 0; atol=TOLERANCE))
             # Update results
@@ -96,5 +108,6 @@ function run_qc_relax(pm, number_of_iterations)
     end
     A,b = get_pol()
     debug(logger,"Return polytope.")
-    return A,b
+    @info(logger,header)
+    return A,b,optimal_setpoints,header
 end

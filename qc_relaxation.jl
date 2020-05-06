@@ -11,7 +11,7 @@ include("qc_relaxation_methods.jl")
 # Logger settings
 # Silence all: PowerModels.silence()
 dIdx = findall(x->x=="-d" || x=="--debug",ARGS)
-if dIdx
+if length(dIdx) > 0
     LOGLEVEL = ARGS[dIdx[1]+1]
 else
     LOGLEVEL = "info"
@@ -38,6 +38,13 @@ if length(ARGS) > 3
 else
     out_file_name_B = "b_rhs_vec22.csv"
 end
+if length(ARGS) > 4
+    out_file_name_X = ARGS[5]
+else
+    out_file_name_X = "x_set_pts22.csv"
+end
+
+
 debug(logger, string(ARGS))
 
 
@@ -57,14 +64,18 @@ network_data_tight, stats = PowerModels.run_obbt_opf!(network_data,
 power_model = instantiate_model(network_data_tight, ACPPowerModel, PowerModels.build_opf)
 
 info(logger,"Run QC relaxation for $matpower_file_name.")
-A_out,b_out = run_qc_relax(power_model, number_of_iterations)
-
+A_out,b_out,x_opt,header = run_qc_relax(power_model, number_of_iterations)
 
 
 # Write results to file
 info(logger,"Output files written:\n\t- $out_file_name_A \n\t- $out_file_name_B.")
-writedlm( out_file_name_A,  A_out, ',')
-writedlm( out_file_name_B,  b_out, ',')
+writedlm(out_file_name_A, A_out, ',')
+writedlm(out_file_name_B, b_out, ',')
+
+writedlm(out_file_name_X, header, ',')
+open(out_file_name_X,"a") do io
+    writedlm(io, x_opt, ',')
+end
 
 elapsed = time() - start
 info(logger,"Elapsed time: $elapsed sec .")
