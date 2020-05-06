@@ -1,5 +1,5 @@
 clear
-
+t = tic;
 caseName = 'case14';
 fprintf(pad(['Load casefile ' caseName ' '],50,'right','.'))
 mpc = loadcase(caseName);
@@ -17,7 +17,9 @@ warning off
 warning on
 fprintf('[ OK ]\n')
 
-btFile = [caseName '_tightened.m'];         % with EXTENSION
+btFile = ['.data\' caseName '_tightened.m'];         % with EXTENSION
+%btFile = ['case_files\' 'case14.m'];
+
 fprintf(pad(['Save BT model ' btFile ' '],50,'right','.'))
 savecase(btFile, mpc)
 fprintf('[ OK ]\n')
@@ -26,16 +28,22 @@ fprintf('[ OK ]\n')
 %   "Iteratively tighten bounds on voltage magnitude and phase-angle
 %   difference variables."
 % res = qc_relax(mpc);
-outFileName = [caseName '_results_' timestamp '.m'];
+tmpF = [pwd '\.data\'];
+outFileNameA = [tmpF caseName '_results_' timestamp 'A.csv'];
+outFileNameB = [tmpF caseName '_results_' timestamp 'b.csv'];
+outFileNameX = [tmpF caseName '_results_' timestamp 'Xopt.csv'];
 
-numberOfIterations=10;
+numberOfIterations=1000;
 
 fprintf(pad('Run BT + QC-ACOPF ',50,'right','.'))
-stat = system("julia qc_relaxation.jl "+btFile+" "+numberOfIterations);
+stat = system(['julia qc_relaxation.jl "' btFile '" "' num2str(numberOfIterations) ... 
+'" "' outFileNameA '" "' outFileNameB '" "' outFileNameX '"']);
 fprintf('[ OK ]\n')
+
 
 % fprintf(pad(['Load output file ' outFileName],50,'right','.'))
 % % read julia output file
 % mpc_new = loadcase(outFileName);
 % fprintf('[ OK ]\n')
 % %powerModelsResult = jsondecode(fileread(outFileName));
+toc(t)
