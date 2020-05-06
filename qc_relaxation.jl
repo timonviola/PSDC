@@ -7,21 +7,27 @@ include("qc_relaxation_methods.jl")
 
 """ Run N number of iterations that executes a modified QC relaxed ACOPF to created
     separating hyper-planes and event reduce."""
-# set logger
-#PowerModels.silence()
-const LOGLEVEL = "info"
-Memento.setlevel!(Memento.getlogger(PowerModels.InfrastructureModels), "error")
+
+# Logger settings
+# Silence all: PowerModels.silence()
+dIdx = findall(x->x=="-d" || x=="--debug",ARGS)
+if dIdx
+    LOGLEVEL = ARGS[dIdx[1]+1]
+else
+    LOGLEVEL = "info"
+end
+
 logger = Memento.config!(LOGLEVEL; fmt="[{level} | {name}]: {msg}")
+Memento.setlevel!(Memento.getlogger(PowerModels.InfrastructureModels), "error")
 if LOGLEVEL == "debug"
     # enable debug:
     ENV["JULIA_DEBUG"] = "all"
 end
+
 # Input data: number of iterations , model name
-
-
 debug(logger, "Input args:")
-const matpower_file_name = "case14.m";#ARGS[1];#"case14.m"
-const number_of_iterations = 1#parse(Int64, ARGS[2]);#200
+const matpower_file_name = ARGS[1];#"case14.m"
+const number_of_iterations = parse(Int64, ARGS[2]);#200
 if length(ARGS) > 2
     out_file_name_A = ARGS[3]
 else
@@ -32,13 +38,14 @@ if length(ARGS) > 3
 else
     out_file_name_B = "b_rhs_vec22.csv"
 end
-@debug ARGS
+debug(logger, string(ARGS))
 
 
 const start = time();
 # Load network data from file
+Memento.setlevel!(Memento.getlogger(PowerModels), "error")
 network_data = PowerModels.parse_file(matpower_file_name)
-
+Memento.setlevel!(Memento.getlogger(PowerModels), "info")
 # Run bound tightening
 info(logger, "Run obbt for $matpower_file_name.")
 network_data_tight, stats = PowerModels.run_obbt_opf!(network_data,
