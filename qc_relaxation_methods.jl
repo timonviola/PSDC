@@ -39,7 +39,7 @@ function get_pol_volume()
     return vol::Number
 end
 
-function get_header_names(variables::AbstractArray{VariableRef})
+function get_header_names(variables::AbstractArray)
     header = [] # used as header in x_opt results csv
     push!(header, JuMP.name.(variables))
     header = map((x) -> uppercase(replace(x, r"0_|\[|\]" => "")),header[1]) # prettify
@@ -55,7 +55,22 @@ function run_qc_relax(pm, number_of_iterations)
     info(logger,"QC relaxation tolerance set to $TOLERANCE .")
     optimal_setpoints = []
     # build optimization problem
-    vars = [pm.var[:nw][0][:pg].data; pm.var[:nw][0][:vm].data];
+    # get variables: PG\{slack} and Vm (all generators)
+    # slack is not defined in "data" dict
+    #
+    # to get all: vars = [pm.var[:nw][0][:pg].data; pm.var[:nw][0][:vm].data];
+    #
+    slack = 1
+    gen_indexes = map(x -> x["gen_bus"], values(pm.data["gen"]))
+    vars = []
+    for i=1:length(pm.var[:nw][0][:pg].data)
+        if i != slack
+            push!(vars, JuMP.variable_by_name(pm.model, string("0_pg[",i,"]")))
+        end
+    end
+    for g in gen_indexes
+        push!(vars, JuMP.variable_by_name(pm.model, string("0_vm[",g,"]")))
+    end
     # extract header names
     header = get_header_names(vars) # call before normalization
 
