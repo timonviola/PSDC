@@ -1,6 +1,6 @@
 clear
 %                   ====== Load matpower case =====
-caseName = 'case14';
+caseName = 'case14';%'case118'; %996 sec for 10 iterations
 mpc = loadcase(caseName);
 
 %                   ====== Run bound tightening =====
@@ -12,7 +12,7 @@ btFile = ['.data\' caseName '_tightened.m'];         % with EXTENSION
 savecase(btFile, mpc)
 
 % ====== Quadratic Convex relaxation of ACOPF with bound tightening =====
-numberOfIterations = 1000;
+numberOfIterations = 10;
 tmpF = [pwd '\.data\'];
 outFileNameA = [tmpF caseName '_results_' timestamp 'A.csv'];
 outFileNameB = [tmpF caseName '_results_' timestamp 'b.csv'];
@@ -20,6 +20,9 @@ outFileNameX = [tmpF caseName '_results_' timestamp 'Xopt.csv'];
 
 stat = system(['julia qc_relaxation.jl "' btFile '" "' num2str(numberOfIterations) ... 
 '" "' outFileNameA '" "' outFileNameB '" "' outFileNameX '"']); % optional -d flag to set log level
+% 
+% stat = system(['julia qc_relaxation.jl "' btFile '" "' num2str(numberOfIterations) ...
+% '" "' outFileNameA '" "' outFileNameB '" "' outFileNameX '" -l debug']);
 
 % ===== Load A,b matrices =====
 A = readmatrix(outFileNameA);

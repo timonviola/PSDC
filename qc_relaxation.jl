@@ -2,83 +2,95 @@ using PowerModels
 using Ipopt
 using DelimitedFiles
 using Memento
+using ArgParse
 include("qc_relaxation_methods.jl")
 
+function parse_cli()
+    s = ArgParseSettings()
+    @add_arg_table! s begin
+        "case_file_name"
+            help = "Case file name (relative or full path with extension).
+            Supported file formats:\n\t- matpower v2.0"
+            required = true
+        "number_of_iterations"
+            help = "Number of polytopes added."
+            arg_type = Int
+            required = true
+        "out_file_name_A"
+            help = "Output file of the convex polytope's A matrix. File fullpath
+            should be defined including the extension (.csv)."
+            required = true
+        "out_file_name_B"
+            help = "Output file of the convex polytope's b vector. File fullpath
+            should be defined including the extension (.csv)."
+            required = true
+        "out_file_name_X"
+            help = "Output file of optimal set points. The first row contains the
+            variable names."
+            required = true
+        "--log", "-l"
+            help = "Define log level. Possible values are: [debug | info |
+            notice | warn | error]."
+            arg_type = String
+            default = "info"
+    end
 
-""" Run N number of iterations that executes a modified QC relaxed ACOPF to created
-    separating hyper-planes and event reduce."""
-
-# Logger settings
-# Silence all: PowerModels.silence()
-dIdx = findall(x->x=="-d" || x=="--debug",ARGS)
-if length(dIdx) > 0
-    LOGLEVEL = ARGS[dIdx[1]+1]
-else
-    LOGLEVEL = "info"
-end
-
-logger = Memento.config!(LOGLEVEL; fmt="[{level} | {name}]: {msg}")
-Memento.setlevel!(Memento.getlogger(PowerModels.InfrastructureModels), "error")
-if LOGLEVEL == "debug"
-    # enable debug:
-    ENV["JULIA_DEBUG"] = "all"
-end
-
-# Input data: number of iterations , model name
-debug(logger, "Input args:")
-const matpower_file_name = ARGS[1];#"case14.m"
-const number_of_iterations = parse(Int64, ARGS[2]);#200
-if length(ARGS) > 2
-    out_file_name_A = ARGS[3]
-else
-    out_file_name_A = "A_lhs_mat22.csv"
-end
-if length(ARGS) > 3
-    out_file_name_B = ARGS[4]
-else
-    out_file_name_B = "b_rhs_vec22.csv"
-end
-if length(ARGS) > 4
-    out_file_name_X = ARGS[5]
-else
-    out_file_name_X = "x_set_pts22.csv"
+    return parse_args(s)
 end
 
 
-debug(logger, string(ARGS))
+function main()
+    """ Run N number of iterations that executes a modified QC relaxed ACOPF to created
+        separating hyper-planes and event reduce."""
+
+    parsed_inputs = parse_cli()
+    # Logger settings
+    # Silence all: PowerModels.silence()
+    logger = Memento.config!(parsed_inputs["log"]; fmt="[{level} | {name}]: {msg}")
+    Memento.setlevel!(Memento.getlogger(PowerModels.InfrastructureModels), "error")
+    if parsed_inputs["log"] == "debug"
+        # enable debug:
+        ENV["JULIA_DEBUG"] = "all"
+    end
+
+    # Input data: number of iterations , model name
+    debug(logger, string("ARGS: ", parsed_inputs))
+
+    start = time();
+    # Load network data from file
+    Memento.setlevel!(Memento.getlogger(PowerModels), "error")
+    network_data = PowerModels.parse_file(parsed_inputs["case_file_name"])
+    Memento.setlevel!(Memento.getlogger(PowerModels), "info")
+    # Run bound tightening
+    info(logger, string("Run obbt for ", parsed_inputs["case_file_name"],"."))
+    network_data_tight, stats = PowerModels.run_obbt_opf!(network_data,
+        optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0);
+        model_constructor=ACPPowerModel, max_iter=1, time_limit=120.0);
+    #TODO: set max_iter to 3-4 on production version
+    warn(logger,"obbt opf max_iter should be set to higher!")
+
+    # Initialize abstract power system model
+    power_model = instantiate_model(network_data_tight, ACPPowerModel, PowerModels.build_opf)
+
+    info(logger,string("Run QC relaxation for, ",  parsed_inputs["case_file_name"],"."))
+    A_out,b_out,x_opt,header = run_qc_relax(power_model, parsed_inputs["number_of_iterations"])
 
 
-const start = time();
-# Load network data from file
-Memento.setlevel!(Memento.getlogger(PowerModels), "error")
-network_data = PowerModels.parse_file(matpower_file_name)
-Memento.setlevel!(Memento.getlogger(PowerModels), "info")
-# Run bound tightening
-info(logger, "Run obbt for $matpower_file_name.")
-network_data_tight, stats = PowerModels.run_obbt_opf!(network_data,
-    optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0);
-    model_constructor=ACPPowerModel, max_iter=1, time_limit=120.0);
-#update_data!(network_data,network_data_tight)
+    # Write results to file
+    info(logger,string("Output files written:\n\t- ", parsed_inputs["out_file_name_A"],
+                        "\n\t- ", parsed_inputs["out_file_name_B"],
+                        "\n\t- ", parsed_inputs["out_file_name_X"],"."))
+    writedlm(parsed_inputs["out_file_name_A"], A_out, ',')
+    writedlm(parsed_inputs["out_file_name_B"], b_out, ',')
 
-# Initialize abstract power system model
-power_model = instantiate_model(network_data_tight, ACPPowerModel, PowerModels.build_opf)
+    writedlm(parsed_inputs["out_file_name_X"], header, ',')
+    open(parsed_inputs["out_file_name_X"],"a") do io
+        writedlm(io, x_opt, ',')
+    end
 
-info(logger,"Run QC relaxation for $matpower_file_name.")
-A_out,b_out,x_opt,header = run_qc_relax(power_model, number_of_iterations)
-
-
-# Write results to file
-info(logger,"Output files written:\n\t- $out_file_name_A \n\t- $out_file_name_B.")
-writedlm(out_file_name_A, A_out, ',')
-writedlm(out_file_name_B, b_out, ',')
-
-writedlm(out_file_name_X, header, ',')
-open(out_file_name_X,"a") do io
-    writedlm(io, x_opt, ',')
+    elapsed = time() - start
+    info(logger,"Elapsed time: $elapsed sec .")
 end
 
-elapsed = time() - start
-info(logger,"Elapsed time: $elapsed sec .")
-
-# Julia/REPL has some issues with scoping which actually not that starightforward
-# https://discourse.julialang.org/t/new-scope-solution/16707/227
+logger = Memento.config!("info"; fmt="[{level} | {name}]: {msg}")
+main()
