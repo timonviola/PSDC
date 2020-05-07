@@ -1,7 +1,7 @@
 #!/bin/sh
 #BSUB -q elektro
 #BSUB -J data_set
-#BSUB -W 10:00
+#BSUB -W 72:00
 #BSUB -n 24
 #BSUB -R "rusage[mem=8GB]"
 #BSUB -N 
