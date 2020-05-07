@@ -1,4 +1,5 @@
 clear
+util.add_dependencies
 %                   ====== Load matpower case =====
 caseName = 'case14';%'case118'; %996 sec for 10 iterations
 mpc = loadcase(caseName);
