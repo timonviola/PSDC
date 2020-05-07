@@ -5,7 +5,7 @@ util.add_dependencies % add PSAT and MATPOWER to path
 
 %% Set up cluster
 clust=parcluster(dccClusterProfile());    % load the default cluster profile
-numw = 64;
+numw = 100;
 p = parpool(clust, numw);
 disp(p)
 

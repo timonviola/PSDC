@@ -1,4 +1,5 @@
 clear
+util.add_dependencies
 %                   ====== Load matpower case =====
 caseName = 'case14';%'case118'; %996 sec for 10 iterations
 mpc = loadcase(caseName);
@@ -8,12 +9,12 @@ options.bounds = 1; % tighten both voltage and angle differences
 warning off
 [mpc, info] = tighten_bounds(mpc, options);
 warning on
-btFile = ['.data\' caseName '_tightened.m'];         % with EXTENSION
+btFile = ['.data' filesep caseName '_tightened.m'];         % with EXTENSION
 savecase(btFile, mpc)
 
 % ====== Quadratic Convex relaxation of ACOPF with bound tightening =====
-numberOfIterations = 1000;
-tmpF = [pwd '\.data\'];
+numberOfIterations = 10;
+tmpF = [pwd filesep '.data' filesep];
 outFileNameA = [tmpF caseName '_results_' timestamp 'A.csv'];
 outFileNameB = [tmpF caseName '_results_' timestamp 'b.csv'];
 outFileNameX = [tmpF caseName '_results_' timestamp 'Xopt.csv'];
