@@ -12,6 +12,10 @@ function parse_cli()
             help = "Case file name (relative or full path with extension).
             Supported file formats:\n\t- matpower v2.0"
             required = true
+        "case_file_name_tightened"
+            help = "Tightened output case file name (relative or full path with
+            extension). Supported file formats:\n\t- matpower v2.0"
+            required = true
         "number_of_iterations"
             help = "Number of polytopes added."
             arg_type = Int
@@ -68,6 +72,13 @@ function main()
         model_constructor=ACPPowerModel, max_iter=1, time_limit=120.0);
     #TODO: set max_iter to 3-4 on production version
     warn(logger,"obbt opf max_iter should be set to higher!")
+    # MATPOWER export
+    # update original data with solution
+    update_data!(network_data, network_data_tight) #network_data_tight["solution"]
+    f = open(parsed_inputs["case_file_name_tightened"],"w")
+    export_matpower(f,matpowerData)
+    close(f)
+
 
     # Initialize abstract power system model
     power_model = instantiate_model(network_data_tight, ACPPowerModel, PowerModels.build_opf)
