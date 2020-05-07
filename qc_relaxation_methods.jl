@@ -12,7 +12,8 @@ function create_pol(N::Integer)
     rSTDO = R"""
     library(volesti)
     P <- GenCube($N,'H')
-    """
+    P$b <- cbind(matrix(0,1,$N), matrix(1,1,$N))
+    """ # mondify cube from [-1 1] to [0 1]
     return rcopy(R"P$A"),rcopy(R"P$b")
 end
 
