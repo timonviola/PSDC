@@ -2,8 +2,10 @@
 *.zip
 *.m~$
 *.out
+Error*
 ERROR*
 output*
+out_*.txt
 fm_call.m
 
 .data/
