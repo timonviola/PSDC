@@ -76,7 +76,7 @@ function main()
     # update original data with solution
     update_data!(network_data, network_data_tight) #network_data_tight["solution"]
     f = open(parsed_inputs["case_file_name_tightened"],"w")
-    export_matpower(f,matpowerData)
+    export_matpower(f,network_data)
     close(f)
 
 
