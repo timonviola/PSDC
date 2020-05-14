@@ -39,7 +39,7 @@ parfor i =1:N
     caseName = 'd_009_dyn';
     ps.runpsat(caseName,'data');
     ps.runpsat('pf')
-    ps.PV.store = spaceGrid(i,:);
+    ps.PV.store = spaceGrid(i,:); % Change generator Pg output
     ps.runpsat('pf');
     ps.fm_abcd();
     
