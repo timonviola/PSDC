@@ -1,7 +1,8 @@
 # using PowerModels
 using JuMP
+using Suppressor
 import Ipopt
-using RCall # use RCall since hitandrun has an efficient implementation there,
+@suppress using RCall # use RCall since hitandrun has an efficient implementation there,
 ## the prefered Julia lib would be MAMBA but it does not have this sampling. See:
 ## https://mambajl.readthedocs.io/en/latest/samplers.html?highlight=sample#sampling-functions
 
@@ -39,7 +40,32 @@ function get_pol_volume()
     vol = rcopy(R"volume(P)")
     return vol::Number
 end
+
+function sample_polyhedron(N::Integer,A::AbstractArray=[],b::AbstractArray=[])
+"""Get N number of uniformly distributed samples from the convex polytope
+    defined by A and b. The polytope is most likely defined in the R session
+    already. If A and b are not given just call sample_pol"""
+    if ~isempty(A)
+        # define polytope by A and b using R call
+    end
+    samples = transpose(sample_pol(N))
+    return samples::AbstractArray
+end
 # ================ module end ===============================
+
+function tt(v, A)
+"""General purpose method that implements NxM matrix multiply by 1xM vector, so
+    that each column of the matrix is multiplied by the corresponding value of
+    the vector."""
+    r = similar(A)
+    @inbounds for j = 1:size(A,2)
+        @simd for i = 1:size(A,1)
+            r[i,j] = v[j] * A[i,j]
+        end
+    end
+    r
+end
+
 
 function get_header_names(variables::AbstractArray)
     header = [] # used as header in x_opt results csv
@@ -84,6 +110,11 @@ function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer)
     header = get_header_names(vars) # call before normalization
 
     N = length(vars);
+#TODO: normalize using: [x - (lower bound)]/(upper bound - lower bound)
+# in fact the variables should be left alone, but all upper - lower bounds should be set to [0 1]
+# than at the end I should just scale these back. We are going through all the trouble
+# so it is easy to create an N dimensional unit cube (polytope).
+#TODO: re-scale using: [x*(upper bound - lower bound)]+lower bound
     nFactor = JuMP.upper_bound.(vars)
     # auxiliary variables to bridge AffExpr <-> NLconstraint
     #   See "Syntax notes" http://www.juliaopt.org/JuMP.jl/dev/nlp/#Nonlinear-Modeling-1)
@@ -132,6 +163,6 @@ function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer)
     end
     A,b = get_pol()
     debug(logger,"Return polytope.")
-    @info(logger,header)
-    return A,b,optimal_setpoints,header
+    debug(logger, string("Variable Names: ", header))
+    return A,b,optimal_setpoints,header,nFactor
 end
