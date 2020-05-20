@@ -79,24 +79,25 @@ success(4) = sum(Fv) < 1;
 if PRINT
     % gen data
     NG = size(powerFlowResults.gen.PG,1);
-    header = {'GEN PG','GEN QG'};
-    subheader = {'min','val','max',' ','min','val','max'};
-    sFormat = [repmat('%8s',1,size(subheader,2)) '\n'];
-    util.printHeader('%18s%32s\n',header,'\n\n<strong>%s</strong>\n','OPF LIMITS');
+    header = {' Bus','GEN PG','GEN QG'};
+    subheader = {'#','min','val','max',' ','min','val','max'};
+    sFormat = ['%3s', repmat('%8s',1,size(subheader,2)-1) '\n'];
+    util.printHeader('%3s%18s%32s\n',header,'\n\n<strong>%s</strong>\n','OPF LIMITS');
     util.printHeader(sFormat,subheader)
-    tFormat = '%9.3f%9.3f%9.3f\t\t%9.3f%9.3f%9.3f\n';
-    tData = [matpowerCase.gen(:,PMIN)-TOL,powerFlowResults.gen.PG(:),...
+    tFormat = ' %2d%9.3f%9.3f%9.3f\t\t%9.3f%9.3f%9.3f\n';
+    tData = [powerFlowResults.gen.idx,...
+          matpowerCase.gen(:,PMIN)-TOL,powerFlowResults.gen.PG(:),...
           matpowerCase.gen(:,PMAX)+TOL,matpowerCase.gen(:,QMIN)-TOL,...
           powerFlowResults.gen.QG(:),matpowerCase.gen(:,QMAX)+TOL];
     util.printTableContent(NG,tFormat,tData);
     % bus data
     NB = size(powerFlowResults.VM,1);
-    subheader = {'min','val','max'};
-    sFormat = [repmat('%8s',1,size(subheader,2)) '\n'];
-    tFormat = [repmat('%9.3f',1,3) '\n'];
-    tData = [matpowerCase.bus(:,VMIN)-TOL, powerFlowResults.VM,...
-        matpowerCase.bus(:,VMAX)+TOL];
-    util.printHeader('\n%18s\n',{'BUS VM'});
+    subheader = {'#','min','val','max'};
+    sFormat = ['%3s',repmat('%8s',1,size(subheader,2)-1) '\n'];
+    tFormat = [' %2d',repmat('%9.3f',1,3) '\n'];
+    tData = [(1:NB)',matpowerCase.bus(:,VMIN)-TOL,...
+        powerFlowResults.VM,matpowerCase.bus(:,VMAX)+TOL];
+    util.printHeader('\n %3s%18s\n',{'Bus','BUS VM'});
     util.printHeader(sFormat,subheader)
     util.printTableContent(NB,tFormat,tData)
     % branch data
