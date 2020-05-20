@@ -37,9 +37,12 @@ ps = psat('command_line_psat',true,'nosplash',true);
 ps.clpsat.mesg = 0;
 ps.clpsat.readfile = 0;
 % enforce q-limits w/ bus type swing
-ps.Settings.pv2pq = 1;
+% do not enforce per default
+ps.Settings.pv2pq = 0;
 ps.runpsat(psatFName,'data')
 ps.runpsat('pf') 
+
+%TODO: check setPoints size = 2xNG - 1
 
 % ----- Set P_g, V_g -----
 PG = 4; VG = 5;
@@ -63,11 +66,33 @@ res = ps.powerFlowResults(options{:});
 % ----- Optimal Power Flow criteria -----
 [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,options{:});
 
-% ----- Small Signal Stability -----
-ps.fm_abcd();
-[sssStab, minDR] =...
-    SmallSignalStability.checkSmallSignalStability(.03,ps.LA.a);
-
+% TODO if failed set ps.Settings.pv2pq = 1; and retry.
+if ~opfStab
+    if any(strcmp(options,'print'))
+        warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
+        'Retry with enforced Q-limits.\nPG QG VM Sf\n' num2str(opfDet)])
+    end    
+    % try with enforced q-limits
+    ps.Settings.pv2pq = 1;
+    ps.SW.store = slackData;
+    ps.PV.store = generatorData;
+    ps.runpsat('pf');
+    res = ps.powerFlowResults(options{:});
+    [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,options{:});
+end
+if ~opfStab
+    sssStab = nan;
+    minDR = nan;
+    if any(strcmp(options,'print'))
+        warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
+        '\nPG QG VM Sf\n' num2str(opfDet)])
+    end  
+else
+    % ----- Small Signal Stability -----
+    ps.fm_abcd();
+    [sssStab, minDR] =...
+        SmallSignalStability.checkSmallSignalStability(.03,ps.LA.a);
+end
 % ----- output -----
 if nargout >= 1
     class = opfStab && sssStab;
