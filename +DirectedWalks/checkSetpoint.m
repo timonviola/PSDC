@@ -37,7 +37,7 @@ ps = psat('command_line_psat',true,'nosplash',true);
 ps.clpsat.mesg = 0;
 ps.clpsat.readfile = 0;
 % enforce q-limits w/ bus type swing
-ps.Settings.violations = 'off';
+ps.Settings.pv2pq = 1;
 ps.runpsat(psatFName,'data')
 ps.runpsat('pf') 
 
@@ -49,8 +49,11 @@ nPG = size(ps.PV.store,1);
 generatorData = ps.PV.store;
 [~,sortIdx] = sort(generatorData(:,1));
 generatorData(sortIdx,PG) = setPoints(1:nPG);
-generatorData(sortIdx,VG) = setPoints(nPG+1:end);
+slackData = ps.SW.store;
+slackData(4) = setPoints(nPG+1);
+generatorData(sortIdx,VG) = setPoints(nPG+2:end);
 % re-assign modified values to psat obj
+ps.SW.store = slackData;
 ps.PV.store = generatorData;
 % run modified pf
 ps.runpsat('pf');
@@ -74,7 +77,7 @@ if nargout >= 2
 	details = [opfDet, sssStab];
 	% return the boolean vector of criteria check results
     varargout{2} = details;
-    end
+end
 if nargout >= 3
     % return the smallest damping ratio
     varargout{3} = minDR;
@@ -83,9 +86,6 @@ end
 % if nargout >= 4
 %     varargout{4} = ps;
 % end
-
-
-
 end
 
 
