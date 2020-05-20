@@ -76,6 +76,8 @@ Fv(3) = any(find(F > matpowerCase.branch(:, RATE_C) + ...
 success(4) = sum(Fv) < 1;
 
 %% ----- print -----
+% TODO: highight the line/column of the value violation using error() or
+% '<strong></strong>'. success and qChecks etc. contains all information.
 if PRINT
     % gen data
     NG = size(powerFlowResults.gen.PG,1);
