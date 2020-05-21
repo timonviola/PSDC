@@ -9,6 +9,6 @@ psr.fm_abcd()
 
 
 
-psr = psat('command_line_psat',true,'nosplash',true);
-psr.runpsat('case_files\d_009_dyn.m','data')
-psr.runpsat('pf')
+% psr = psat('command_line_psat',true,'nosplash',true);
+% psr.runpsat('case_files\d_009_dyn.m','data')
+% psr.runpsat('pf')

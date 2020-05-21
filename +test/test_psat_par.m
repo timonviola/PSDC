@@ -25,7 +25,7 @@ end
 p.addAttachedFiles([pwd filesep 'case_files' filesep 'd_009_dyn.m']);
 
 %% Pre-allocate
-N = 10;%e6;
+N = 100;
 
 
 voltages = cell(N,1);       % voltages
@@ -40,7 +40,7 @@ parfor i =1:N
     ps.clpsat.mesg = 0;
     % do not reload data file on pf run
     ps.clpsat.readfile = 0;
-
+    ps.Settings.pv2pq=1;
     caseName = 'case_files/d_009_dyn.m';
     ps.runpsat(caseName,'data');
     ps.runpsat('pf')
@@ -59,4 +59,7 @@ end
 
 fprintf('Saving file to: %s\n',pwd) 
 fprintf('Saving file: %s\n',[mfilename strrep(sprintf('%.2g',N),'+','') '.mat'])
-save([mfilename strrep(sprintf('%.2g',N),'+','') '.mat'],'Asys','voltages')
+fName = [mfilename strrep(sprintf('%.2g',N),'+','') '.mat'];
+save(fName,'Asys','voltages')
+
+assert(isfile(fName))
