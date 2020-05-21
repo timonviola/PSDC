@@ -2,6 +2,7 @@
 using JuMP
 using Suppressor
 import Ipopt
+#TODO: move RCall to run_qc_relax
 @suppress using RCall # use RCall since hitandrun has an efficient implementation there,
 ## the prefered Julia lib would be MAMBA but it does not have this sampling. See:
 ## https://mambajl.readthedocs.io/en/latest/samplers.html?highlight=sample#sampling-functions
@@ -165,4 +166,41 @@ function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer)
     debug(logger,"Return polytope.")
     debug(logger, string("Variable Names: ", header))
     return A,b,optimal_setpoints,header,nFactor
+end
+
+function mod_acopf!(pm::AbstractPowerModel)
+"""Modify the objective function and add NL constraint to AC-OPF problem."""
+    vars = []
+    slack_gen_idx = get_slack_idx(pm)
+    for i=1:length(pm.var[:nw][0][:pg].data)
+        if i != slack_gen_idx
+            push!(vars, JuMP.variable_by_name(pm.model, string("0_pg[",i,"]")))
+        end
+    end
+    gen_indexes = map(x -> x["gen_bus"], values(pm.data["gen"]))
+    for g in gen_indexes
+        push!(vars, JuMP.variable_by_name(pm.model, string("0_vm[",g,"]")))
+    end
+    pm.model[:vars] = vars;
+    N = length(vars);
+    x_hat = zeros(1,N);
+
+    @variable(pm.model, r);
+    @objective(pm.model, Min, r);
+    @NLparameter(pm.model, x_hat_p[i = 1:N] == x_hat[i]) # current row of samples
+    pm.model[:x_hat_p] = x_hat_p;
+
+    @NLconstraint(pm.model, con_sphere,
+        sqrt(sum((vars[i]-x_hat_p[i])^2 for i in 1:N))<= r);
+
+    return nothing
+end
+
+function run_mod_acopf(pm::AbstractPowerModel,sp::AbstractArray)
+    """Run modified ACOPF with setpoints defined by sp"""
+    power_model = pm; # do not modify original model
+    JuMP.set_value.(power_model.model[:x_hat_p],sp)
+    result = optimize_model!(power_model, optimizer=optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0))
+
+    return JuMP.value.(power_model.model[:vars])
 end
