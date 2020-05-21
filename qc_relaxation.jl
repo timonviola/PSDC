@@ -96,7 +96,9 @@ function main()
     end
 
     # Initialize abstract power system model
-    power_model = instantiate_model(network_data_tight, ACPPowerModel, PowerModels.build_opf)
+    #TODO: I think ACPPowerModel is the acopf formulation and PowerModels.QCRMPowerModel is the quadratic relaxation
+    # ref: https://lanl-ansi.github.io/PowerModels.jl/stable/formulation-details/#Formulation-Details-1
+    power_model = instantiate_model(network_data_tight, QCRMPowerModel, PowerModels.build_opf)
 
     info(logger,string("Run QC relaxation for, ",  parsed_inputs["case_file_name"],"."))
     A_out,b_out,x_opt,header,scaling_factor = run_qc_relax(power_model, parsed_inputs["number_of_iterations"])
