@@ -1,51 +1,89 @@
 clear
-util.add_dependencies
-%% Load matpower case
-caseName = 'case14';%'case118'; %996 sec for 10 iterations
-mpc = loadcase(caseName);
+t = tic;
+CASE_NAME = 'case14';
+CASE_FILE = 'C:\Users\Timon\OneDrive - Danmarks Tekniske Universitet\Denmark\DTU\2019_20_II\software\case14.m';
+PSAT_FILE = 'case_files\d_014_dyn_mdl_pretty.m';
+TS = timestamp;
+btFile = ['.data\' CASE_NAME '_tightened' TS '.m'];
+% Separating planes of polytope
+N_ITERATIONS = 1000;
+% Number of uniform samples from the polytope
+N_SAMPLES=1000;
 
-%% Run bound tightening
-options.bounds = 1; % tighten both voltage and angle differences
-warning off 
+% bt 1
+mpc = loadcase(CASE_FILE);
+options.bounds = 1;
+warning off
 [mpc, info] = tighten_bounds(mpc, options);
 warning on
-btFile = ['.data' filesep caseName '_tightened.m'];         % with EXTENSION
 savecase(btFile, mpc)
+fprintf('BT #1 - '); toc(t)
 
-%% Quadratic Convex relaxation of ACOPF with bound tightening
-numberOfIterations = 10;
-tmpF = [pwd filesep '.data' filesep];
-outFileNameA = [tmpF caseName '_results_' timestamp 'A.csv'];
-outFileNameB = [tmpF caseName '_results_' timestamp 'b.csv'];
-outFileNameX = [tmpF caseName '_results_' timestamp 'Xopt.csv'];
+% bt2 + QC 
+tbt2 = tic;
+hF = [pwd '\.data\'];
+OUT_FILE_NAME_SAMPLES=[hF CASE_NAME '_QCRM_' num2str(N_ITERATIONS) '.csv'];
+stat = system(['julia qc_relaxation.jl "'  btFile '" "'...
+    num2str(N_ITERATIONS) '" "' OUT_FILE_NAME_SAMPLES '"  "'...
+    num2str(N_SAMPLES) '"']);
+if stat
+    error('PSDC:julia','Something went wrong.')
+end
+% acopf checks
+ACOPF_SEED = [hF CASE_NAME '_ACOPF.csv'];
+stat = system(['julia opf_par.jl "' ACOPF_SEED '" "' CASE_FILE '" "' ...
+    OUT_FILE_NAME_SAMPLES]);
+if stat
+    error('PSDC:julia','Something went wrong.')
+end
+acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
+acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
+[C, ia, ic]= unique(acopfResults,'stable');
+if size(C) == size(acopfResults)
+    warning('some acopf values are doubled')
+end
+fprintf('BT #2 QC - '); toc(tbt2)
+fprintf('Total - '); toc(t)
 
-stat = system(['julia qc_relaxation.jl "' btFile '" "' num2str(numberOfIterations) ... 
-'" "' outFileNameA '" "' outFileNameB '" "' outFileNameX '"']);
-% 
-% stat = system(['julia qc_relaxation.jl "' btFile '" "' num2str(numberOfIterations) ...
-% '" "' outFileNameA '" "' outFileNameB '" "' outFileNameX '" -l debug']);
+% SSS, Directed walks
+tsss = tic;
+N = size(acopfResults,1);
+stable = nan(N,1);
+classDetails = cell(N,1);
+dampingRatio = nan(N,1);
+if ispc
+    if isempty(gcp)
+        p = parpool('nocreate');
+    else
+        p = gcp();
+    end
+else
+    clust=parcluster(dccClusterProfile());
+    numw = 100;
+    p = parpool(clust, numw);
+end
+if ispc
+    p.addAttachedFiles('c:\Users\Timon\myPSAT\psat\');
+else
+    p.addAttachedFiles('~/thesis/psat/');
+end
+p.addAttachedFiles(PSAT_FILE);
+p.addAttachedFiles(CASE_FILE);
+pw = textBar(N,'Parallel Directed walks');
+parfor i = 1:N
+    [stable(i), classDetails{i}, dampingRatio(i)] = ...
+        DirectedWalks.checkSetpoint(acopfResults{i,:},PSAT_FILE,CASE_FILE);
+    increment(pw)
+end
+delete(pw)
 
-%% Load A,b matrices
-A = readmatrix(outFileNameA);
-b = readmatrix(outFileNameB);
-xOpt = readtable(outFileNameX, 'ReadVariableNames',true);
-xOpt = xOpt(:,sort(xOpt.Properties.VariableNames)); % sort columns
+fprintf('DW - '); toc(tsss)
+fprintf('Total - '); toc(t)
+save([CASE_NAME '_final_results_' TS '.csv'],'stable','classDetails',...
+    'dampingRatio')
 
-%% Uniform sampling of N2 points from Ax <= b
-nSamples = 1e3;
-N_3 = cprnd(nSamples,A,b); % it might be neccessary to create a mapping between the variables - rescale etc.
-% fRed = 0.9;
-% N_3 = N_3.*fRed;
 
-%% directed walks
-[l, nDim] = size(xOpt);
-setpointClassification = nan(nSamples,1);   
-classDetails = cell(n,1);
-dampingRatio = nan(n,1);
-reTightenedFile = ".data\case14_tightened"; % loadcase() handles the rest
-psatFileName = 'case_files\d_014_dyn_mdl_pretty.m';
-[stable, criteriaPass, minDampingRation] = DirectedWalks.checkSetpoint(sp,psatFileName,reTightenedFile)
-% parfor i = 1:nSamples
-%     [classification(iter,:),classDetails{iter},dampingRatio(iter)] = util.classifyCase(mpc,setpoints(iter,:),genList,mpOption);
-% end
+
+
+
 
