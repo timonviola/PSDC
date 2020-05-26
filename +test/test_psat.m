@@ -27,7 +27,7 @@ caseName = 'd_009_dyn';
 
 fprintf(pad(['Load case ' caseName],50,'right','.'))
 % ps.runpsat(caseName,caseFolder,'/case_files/','data');
-ps.runpsat('case_files\d_009_dyn.m','data');
+ps.runpsat('case_files\d_IEEE68bus.m','data');
 fprintf('SUCCESSFUL\n')
 
 fprintf(pad('Run power-flow',50,'right','.'))
