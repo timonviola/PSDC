@@ -1,3 +1,4 @@
+% IEEE14 BUS TEST SYSTEM - generator limits set to matpower case14 lims
 Bus.con = [ ...
 % bus no.   Vbase   V0      Th0   area no.  Reg no.      
   1         69      1       0       4       1;

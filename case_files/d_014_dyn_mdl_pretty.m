@@ -1,3 +1,4 @@
+% IEEE14 BUS TEST SYSTEM - commented data file
 Bus.con = [ ...
 % bus no.   Vbase   V0      Th0   area no.  Reg no.      
   1         69      1       0       4       1;
