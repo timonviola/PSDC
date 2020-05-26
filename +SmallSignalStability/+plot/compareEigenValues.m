@@ -51,7 +51,7 @@ oldColor = [0 0 0];
 function showData(varargin)      
       % Get current position of slider
       newVal = round(varargin{1}.Value);
-      fprintf('in: %3.3f\trounded: %d \n',varargin{1}.Value,newVal)
+      %fprintf('in: %3.3f\trounded: %d \n',varargin{1}.Value,newVal)
       varargin{1}.Value = newVal;       % bound it
       [~,zeta,~] = SmallSignalStability.damp_(A_matrices{newVal});
       dText.String = "Damping ratio: " + max(zeta);
