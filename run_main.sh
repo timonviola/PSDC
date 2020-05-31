@@ -10,5 +10,8 @@
 
 
 # ---- execute matlab script -----
+module load matlab/R2019a
+module load julia/1.1.1
+export PATH=/app/R/3.6.3-mkl2020/bin:$PATH
 
-matlab -nodisplay -nosplash -nodesktop -r "run('~/thesis/PSDC/main.m');exit;"
+matlab -nodisplay -batch "/zhome/6b/5/134657/thesis/PSDC/call_julia.m"
