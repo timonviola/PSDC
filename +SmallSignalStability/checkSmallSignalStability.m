@@ -11,7 +11,7 @@ function varargout = checkSmallSignalStability(dr_lim,Asys)
 %   w_n - undamped natural frequency
 %   zeta- damping ratios
 %   p   - poles, in case eigenvalues
-[~, zeta, ~] = damp_(Asys);
+[~, zeta, ~] = SmallSignalStability.damp_(Asys);
 
 
 minZeta = min(zeta);

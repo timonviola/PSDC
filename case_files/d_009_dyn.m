@@ -1,11 +1,10 @@
-% D_009_DYN  WSCC 9 BUS 3 machine test system - original system
-%   data available at:
+% D_009_DYN  WSCC 9 BUS 3 machine test system
+%   original system data available at:
 %           P.W.Sauer, M.A.Pai Power System Dynamics and Stability
 % 
 %  
 %
-%   This test file is taken from PSAT v2.1.11. and formatted for better
-%   readability.
+%   This test file is taken from PSAT v2.1.11. and formatted.
 % 
 
 

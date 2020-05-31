@@ -4,9 +4,17 @@
 util.add_dependencies % add PSAT and MATPOWER to path
 
 %% Set up cluster
-clust=parcluster(dccClusterProfile());    % load the default cluster profile
-numw = 100;
-p = parpool(clust, numw);
+if ispc
+    if isempty(gcp)
+        p = parpool('nocreate');
+    else
+        p = gcp();
+    end
+else
+    clust=parcluster(dccClusterProfile());    % load the default cluster profile
+    numw = 100;
+    p = parpool(clust, numw);
+end
 disp(p)
 
 if ispc
@@ -14,20 +22,17 @@ if ispc
 else
     p.addAttachedFiles('~/thesis/psat/');
 end
-p.addAttachedFiles([pwd filesep 'd_009_dyn.m']);
+p.addAttachedFiles([pwd filesep 'case_files' filesep 'd_009_dyn.m']);
 
 %% Pre-allocate
-N = 1e6;
-nCol = 11;
-dom = [-200 200];
-spaceGrid = lhsdesign(N,nCol);
-spaceGrid = spaceGrid.*diff(dom)+dom(1);    % Generator set points
+N = 100;
+
 
 voltages = cell(N,1);       % voltages
 Asys = cell(N,1);           % system matrices
 
 %% PSAT
-
+PG = 4;
 % Update values
 parfor i =1:N
     ps = psat('command_line_psat',true,'nosplash',true);
@@ -35,11 +40,16 @@ parfor i =1:N
     ps.clpsat.mesg = 0;
     % do not reload data file on pf run
     ps.clpsat.readfile = 0;
-
-    caseName = 'd_009_dyn';
+    ps.Settings.pv2pq=1;
+    caseName = 'case_files/d_009_dyn.m';
     ps.runpsat(caseName,'data');
     ps.runpsat('pf')
-    ps.PV.store = spaceGrid(i,:);
+     % Change generator Pg output
+    nPg = size(ps.PV.store,1);
+    generatorData = ps.PV.store;
+    generatorData(:,PG) = rand(nPg,1)*2;
+    ps.PV.store = generatorData;
+    
     ps.runpsat('pf');
     ps.fm_abcd();
     
@@ -49,4 +59,7 @@ end
 
 fprintf('Saving file to: %s\n',pwd) 
 fprintf('Saving file: %s\n',[mfilename strrep(sprintf('%.2g',N),'+','') '.mat'])
-save([mfilename strrep(sprintf('%.2g',N),'+','') '.mat'],'Asys','spaceGrid')
+fName = [mfilename strrep(sprintf('%.2g',N),'+','') '.mat'];
+save(fName,'Asys','voltages')
+
+assert(isfile(fName))

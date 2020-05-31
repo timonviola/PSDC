@@ -1,4 +1,4 @@
-% IEEE14 BUS TEST SYSTEM - commented data file
+% IEEE14 BUS TEST SYSTEM - generator limits set to matpower case14 lims
 Bus.con = [ ...
 % bus no.   Vbase   V0      Th0   area no.  Reg no.      
   1         69      1       0       4       1;
@@ -49,7 +49,7 @@ Breaker.con = [ ...
 % Slack Generattor Data format - 1 has to be defined for each network
 SW.con = [ ... 
 %bus no.    S rating    Vrating     V0      Th0     Qmax    Qmin    Vmax    Vmin    Pg0     gamma   z   u
-    1       100         69          1.06    0       9.9     -9.9    1.2     0.8     2.324   1       1   1;
+    1       100         69          1.06    0       0.1     0    1.2     0.8     2.324   1       1   1;
  ];
 
 % PV Generator data format

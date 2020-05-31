@@ -1,3 +1,4 @@
+% 24 BUS model, but no dynamic data is available
 Bus.con = [ ... 
   1  138  1  0  2  1;
   2  138  1  0  2  1;
