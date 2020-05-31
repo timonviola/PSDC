@@ -64,7 +64,8 @@ stat = system(['julia opf_par.jl "' ACOPF_SEED '" "' CASE_FILE '" "' ...
 if stat
     error('PSDC:julia','Something went wrong.')
 end
-% Load the samples
+% Load the samples TODO: LODAD AS DISTRIBUTED ARRAY
+% https://se.mathworks.com/help/parallel-computing/distributing-arrays-to-parallel-workers.html
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 % Sort columns
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
@@ -130,6 +131,7 @@ end
 p.addAttachedFiles(PSAT_FILE);
 p.addAttachedFiles(CASE_FILE);
 
+%% Add first set to data-set
 % Progressbar that shows on STDOUT
 pw = textBar(N,'Parallel Directed walks');
 parfor i = 1:N

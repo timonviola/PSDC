@@ -93,7 +93,7 @@ end
 
 function main()
 """Solve AC-OPF for each point in the data set defined by SAMPLES and save the
-resulting optimal scenarios Pg, Vg values."""
+resulting optimal scenarios' Pg, Vg values."""
     logger = Memento.config!("info"; fmt="[{level} | {name}]: {msg}")
 
     parsed_inputs = parse_cli()
