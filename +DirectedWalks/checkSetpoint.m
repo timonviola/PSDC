@@ -51,9 +51,12 @@ nPG = size(ps.PV.store,1);
 %   PV (generator) buses - section 10.5
 generatorData = ps.PV.store;
 [~,sortIdx] = sort(generatorData(:,1));
+% set PGs 
 generatorData(sortIdx,PG) = setPoints(1:nPG);
 slackData = ps.SW.store;
-slackData(4) = setPoints(nPG+1);
+% set slack voltage!
+slackData(4) = setPoints(nPG+1); 
+% set gen voltages
 generatorData(sortIdx,VG) = setPoints(nPG+2:end);
 % re-assign modified values to psat obj
 ps.SW.store = slackData;
@@ -80,19 +83,19 @@ if ~opfStab
     res = ps.powerFlowResults(options{:});
     [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,options{:});
 end
-if ~opfStab
-    sssStab = nan;
-    minDR = nan;
-    if any(strcmp(options,'print'))
-        warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
-        '\nPG QG VM Sf\n' num2str(opfDet)])
-    end  
-else
+% if ~opfStab
+%     sssStab = nan;
+%     minDR = nan;
+%     if any(strcmp(options,'print'))
+%         warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
+%         '\nPG QG VM Sf\n' num2str(opfDet)])
+%     end  
+% else
     % ----- Small Signal Stability -----
     ps.fm_abcd();
     [sssStab, minDR] =...
         SmallSignalStability.checkSmallSignalStability(.03,ps.LA.a);
-end
+% end
 % ----- output -----
 if nargout >= 1
     class = opfStab && sssStab;
