@@ -1,6 +1,11 @@
 clear
 t = tic;
-load +test\debug_const.mat
+
+ACOPF_SEED = '.data/case14_ACOPF.csv';
+CASE_FILE = 'case_files/case14.m';
+PSAT_FILE = 'case_files/d_014_dyn_mdl_pretty.m';
+
+
 % df = 'set_points_2.csv';
 % % columns are sorted already
 % dwResults = readtable(df, 'ReadVariableNames',false);
@@ -31,9 +36,40 @@ stable = nan(N,1);
 classDetails = cell(N,1);
 % damping ratios (stored separately for easier access)
 dampingRatio = nan(N,1);
+
+
+% Set up cluster
+if ispc
+    if isempty(gcp)
+        p = parpool('nocreate');
+    else
+        p = gcp();
+    end
+else
+    % load the default cluster profile
+    clust=parcluster(dccClusterProfile());
+    numw = 16;
+    p = parpool(clust, numw);
+end
+disp(p)
+
+if ispc
+    p.addAttachedFiles('c:\Users\Timon\myPSAT\psat\');
+else
+    p.addAttachedFiles('~/thesis/psat/');
+    p.addAttachedFiles('~/thesis/textBar/textBar.m');
+end
+p.addAttachedFiles(PSAT_FILE);
+p.addAttachedFiles(CASE_FILE);
+
+
+
+
 % Check all SP's small signal stability
 % Progressbar that shows on STDOUT
-pw = textBar(N,'Parallel Directed walks');
+pw = textBar(N,'Parallel checks');
+
+
 t2 = tic;
 for i = 1:N
     [stable(i), classDetails{i}, dampingRatio(i)] = ...
