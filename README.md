@@ -29,7 +29,16 @@ PSAT*                                                 Version 2.1.11      (R2019
 ```
 PSAT*: custom modifications were added to the referenced version of the package.
 
-
+```
+Julia                                                 v1.0.*
+  "Suppressor"  => v"0.2.0"
+  "JuMP"        => v"0.21.2"
+  "Distributed" => nothing
+  "Ipopt"       => v"0.6.1"
+  "Memento"     => v"1.0.0"
+  "PowerModels" => v"0.15.4"
+  "ArgParse"    => v"1.1.0"
+```
 
 # Installation
 Some tips and notes on installing non-trivial dependencies are given below.
