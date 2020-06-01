@@ -10,3 +10,6 @@
 %   d_IEEE39bus            - IEEE39 BUS test system 10 GENERATORS
 
 
+%   case9                  - Power flow data for 9 bus, 3 generator case.
+%   d_IEEE68bus            - IEEE68 BUS SYSTEM 16 GENERATORS
+
