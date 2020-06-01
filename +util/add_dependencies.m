@@ -8,3 +8,6 @@ addpath(genpath('~/thesis/psat/'))
 addpath(genpath('~/thesis/BTOPF/'))
 % myTools
 addpath('~/thesis/')
+% textbar 
+%%addpath(genpath('~/thesis/textBar'))
+addpath('~/thesis/textBar')
