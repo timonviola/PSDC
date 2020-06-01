@@ -1,4 +1,7 @@
 clear
+if ~ispc
+    util.add_dependencies
+end
 t = tic;
 %% Load matpower case
 % MATPOWER file name    (opf data)
