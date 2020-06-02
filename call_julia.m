@@ -1,3 +1,4 @@
+%   ----- local -----
 clear
 if ~ispc
     util.add_dependencies
@@ -54,7 +55,7 @@ stat = system(['julia qc_relaxation.jl "'  btFile '" "'...
 if stat
     error('PSDC:julia','Something went wrong.')
 end
-
+%   ----- HPC -----
 %% ACOPF checks on samples
 % Run a modified ACOPF on all the samples
 
