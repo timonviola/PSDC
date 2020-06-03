@@ -4,16 +4,21 @@ if ~ispc
     util.add_dependencies
 end
 t = tic;
-%% Load matpower case
-% MATPOWER file name    (opf data)
+
 CASE_NAME = 'case14';
 CASE_FILE = 'C:\Users\Timon\OneDrive - Danmarks Tekniske Universitet\Denmark\DTU\2019_20_II\software\case14.m';
 % PSAT file name        (dynamic data)
 PSAT_FILE = 'case_files\d_014_dyn_mdl_pretty.m';
 % get current timestamp
 TS = timestamp;
-
+OUT_DIR = ['.data' filesep CASE_NAME '_' TS];
 %%
+[status, msg, msgID] = mkdir(OUT_DIR);
+if ~status
+   error('PSCD:base',msg); 
+end
+%% Load matpower case
+% MATPOWER file name    (opf data)
 fprintf(pad(['Load casefile ' CASE_NAME ' '],50,'right','.'))
 mpc = loadcase(CASE_FILE);
 fprintf('[ OK ]\n')
@@ -29,7 +34,7 @@ warning off
 warning on
 fprintf('[ OK ]\n')
 % Define file name with EXTENSION
-btFile = ['.data\' CASE_NAME '_tightened' TS '.m'];
+btFile = [OUT_DIR filesep CASE_NAME '_tightened' TS '.m'];
 
 fprintf(pad(['Save BT model ' btFile ' '],50,'right','.'))
 savecase(btFile, mpc)
@@ -41,7 +46,7 @@ toc(t)
 %   difference variables."
 
 % PSDC home folder \data\
-hF = [pwd '\.data\'];
+hF = [pwd OUT_DIR filesep];
 % Separating planes of polytope
 N_ITERATIONS = 1000;
 % Number of uniform samples from the polytope
