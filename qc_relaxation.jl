@@ -13,6 +13,19 @@ function parse_cli()
             notice | warn | error]."
             arg_type = String
             default = "info"
+        "--vol", "-v"
+            help = "Save A,b polytope data. Define the frequency of saving files
+            e.g.: -v 1000 means that A,b data saved in every 1000th iteration."
+            arg_type = Int
+            default = 0
+        "--bit"
+            help = "Bound tightening ITerations. Max number of iterations in OBBT."
+            arg_type = Int
+            default = 5
+        "--bto"
+            help = "Bound tightening Time Out. Max time spent in OBBT."
+            arg_type = Int
+            default = 120
         "--tightened", "-t"
             help = "Tightened output case file name (relative or full path with
             extension). Supported file formats:\n\t- matpower v2.0"
@@ -47,7 +60,7 @@ function parse_cli()
             arg_type = Int
             required = true
     end
-
+    # to debug: parse_args([raw"C:\Users\Timon\OneDrive - Danmarks Tekniske Universitet\Denmark\DTU\2019_20_II\software\case_files\case9.m","10",raw"C:\Users\Timon\OneDrive - Danmarks Tekniske Universitet\Denmark\DTU\2019_20_II\software\.data\case9_QCRM_1.csv","10"],s)
     return parse_args(s)
 end
 
@@ -76,14 +89,17 @@ function main()
     # Run bound tightening
     info(logger, string("Run obbt for ", parsed_inputs["case_file_name"],"."))
 
+    to = convert(AbstractFloat, parsed_inputs["bto"])
     # suppress Ipopt message
     local network_data_tight, stats
     @suppress_out network_data_tight, stats = PowerModels.run_obbt_opf!(network_data,
         optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0);
-        model_constructor=ACPPowerModel, max_iter=1, time_limit=120.0);
+        model_constructor=ACPPowerModel, max_iter=parsed_inputs["bit"],
+        time_limit=to);
 
-    #TODO: set max_iter to 3-4 on production version
-    warn(logger,"obbt opf max_iter should be set to higher!")
+    if  parsed_inputs["bit"] < 2
+        warn(logger,"obbt opf max_iter should be set to higher!")
+    end
     # MATPOWER export
     # update original data with solution
 
@@ -101,7 +117,7 @@ function main()
     power_model = instantiate_model(network_data_tight, QCRMPowerModel, PowerModels.build_opf)
 
     info(logger,string("Run QC relaxation for, ",  parsed_inputs["case_file_name"],"."))
-    A_out,b_out,x_opt,header,scaling_factor = run_qc_relax(power_model, parsed_inputs["number_of_iterations"])
+    A_out,b_out,x_opt,header,scaling_factor = run_qc_relax(power_model, parsed_inputs["number_of_iterations"],parsed_inputs["vol"])
     debug(logger,string("scaling_factor",scaling_factor))
 
 

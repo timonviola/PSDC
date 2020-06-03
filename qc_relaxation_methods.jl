@@ -11,10 +11,21 @@ const TOLERANCE = 1e-4;
 
 # ================ module begin ===============================
 function create_pol(N::Integer)
+"""Create N-dim unit cube."""
     rSTDO = R"""
     library(volesti)
     P <- GenCube($N,'H')
     P$b <- cbind(matrix(0,1,$N), matrix(1,1,$N))
+    """ # mondify cube from [-1 1] to [0 1]
+    return rcopy(R"P$A"),rcopy(R"P$b")
+end
+
+function create_scaled_pol(N::Integer,U::AbstractArray)
+"""Create polytope with increased upper bounds."""
+    rSTDO = R"""
+    library(volesti)
+    P <- GenCube($N,'H')
+    P$b <- cbind(matrix(0,1,$N), matrix(c(unlist($U)),1,$N))
     """ # mondify cube from [-1 1] to [0 1]
     return rcopy(R"P$A"),rcopy(R"P$b")
 end
@@ -83,7 +94,7 @@ function get_slack_idx(power_model::AbstractPowerModel)
     return parse(Int64, gen_idx[1])
 end
 
-function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer)
+function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer, vol::Integer=0)
     """ Iteratively solve modified QC-AC-OPF
     inputs: power model and number of iterations"""
     # Initialize variables
@@ -111,11 +122,11 @@ function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer)
     header = get_header_names(vars) # call before normalization
 
     N = length(vars);
-#TODO: normalize using: [x - (lower bound)]/(upper bound - lower bound)
-# in fact the variables should be left alone, but all upper - lower bounds should be set to [0 1]
-# than at the end I should just scale these back. We are going through all the trouble
-# so it is easy to create an N dimensional unit cube (polytope).
-#TODO: re-scale using: [x*(upper bound - lower bound)]+lower bound
+#TODO: Currently the variables of the optimization problem are scaled between
+# [0;1] so we sample from a unit cube. if create_scaled_pol() is used the polytope
+# polytope gets scaled and we can remove the scaling of the vars. This later
+# might prove to be the proper solution as I could not make sure that scaling
+# only vars is sufficient.
     nFactor = JuMP.upper_bound.(vars)
     # auxiliary variables to bridge AffExpr <-> NLconstraint
     #   See "Syntax notes" http://www.juliaopt.org/JuMP.jl/dev/nlp/#Nonlinear-Modeling-1)
@@ -143,7 +154,6 @@ function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer)
         n_normT = transpose(x_opt[:] - x_hat); # This can be simply -> objective_value(pm.model) NO, in the article that is not abs() but l^1 norm
         debug(logger,string("Objective_value: " ,JuMP.value(r)))
         push!(optimal_setpoints, (x_opt[:] .* nFactor)' )
-
         if !(isapprox(JuMP.value(r), 0; atol=TOLERANCE))
             # Update results
             add_to_pol(n_normT, n_normT*x_opt)
@@ -157,7 +167,19 @@ function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer)
             debug(logger,e)
             return A,b
         end
-
+        if vol > 0
+            if k % vol == 0 || k == 1
+                # save file
+                A,b = get_pol()
+                if k == 1
+                    writedlm(string("polytope_A_",0,".csv"), A, ',')
+                    writedlm(string("polytope_b_",0,".csv"), b, ',')
+                else
+                    writedlm(string("polytope_A_",k,".csv"), A, ',')
+                    writedlm(string("polytope_b_",k,".csv"), b, ',')
+                end
+            end
+        end
         # print("Volume: ", get_volume(N,A,b))
         JuMP.set_value.(x_hat_p, x_hat)
         debug(logger,"New x_hat JuMP parameter values set.")
