@@ -109,6 +109,8 @@ end
 
 SUCCESS = ~any( 0 == success(1:4));
 switch nargout
+    case 0
+        % do nothing
     case 1
         varargout{1} = SUCCESS;
     case 2
