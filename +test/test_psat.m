@@ -23,11 +23,11 @@ fprintf('SUCCESSFUL\n')
 
 %% Load case, power-flow
 caseFolder = [pwd filesep 'case_files' filesep];
-caseName = 'd_009_dyn';
-
+% caseName = 'd_009_dyn';
+caseName = 'd_IEEE68bus';
 fprintf(pad(['Load case ' caseName],50,'right','.'))
 % ps.runpsat(caseName,caseFolder,'/case_files/','data');
-ps.runpsat('case_files\d_IEEE68bus.m','data');
+ps.runpsat(['case_files' filesep caseName '.m'],'data');
 fprintf('SUCCESSFUL\n')
 
 fprintf(pad('Run power-flow',50,'right','.'))
@@ -49,3 +49,6 @@ fprintf('SUCCESSFUL\n')
 SmallSignalStability.plot.eigPlot([0+1i;0-1i],ax,'decorators',false...
     ,'scatterParams',{'Marker','d','MarkerEdgeColor','g'});
 SmallSignalStability.plot.plotStabMargin(0.03);
+
+%% psat cmd print
+ps.powerFlowResults('print')
