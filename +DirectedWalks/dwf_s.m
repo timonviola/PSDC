@@ -1,19 +1,21 @@
 % inputs
 %   starting point
-
-% DEBUG load ACOPF_SEED, CASE_FILE, PSAT_FILE
-load +test\debug_const.mat
+ACOPF_SEED = '.data/case9_ACOPF.csv';
+CASE_FILE = 'case_files/case9.m';
+PSAT_FILE = 'case_files/d_009_dyn.m';
+% % DEBUG load ACOPF_SEED, CASE_FILE, PSAT_FILE
+% load +test\debug_const.mat
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
-setPoints = acopfResults{1,:};
+setPoints = acopfResults{58,:};
 
 % MATPOWER INIT
 MPC = loadcase(CASE_FILE);
 % PMAX vector of generators
 PMAX = 9; %PMIN = 10;
 gIdx = util.getGenList(MPC);
-gMaxVec = MPC.gen(gIdx,PMAX); % TODO: remove slack
+gMaxVec = MPC.gen(gIdx,PMAX)./MPC.baseMVA; % TODO: remove slack
 % PSAT INIT
 ps = psat('command_line_psat',true,'nosplash',true);
 ps.clpsat.mesg = 0;
@@ -27,7 +29,7 @@ ps.fm_abcd();
 
 
 % min distance from DR (also in getStepSize func)
-D_min = 0.01;
+D_min = 0.01;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
 % max number of iterations
 K_max = 1e3;
 % minimum step size ( also in get step size func)
@@ -46,13 +48,12 @@ nPG = size(ps.PV.store,1);
 
 DR = curDR;
 nSP = setPoints;
-dist = 1;
+dist = getDist(DR);
 
 i = 1;
 % k = 1;
 while i <= K_max
     while dist > D_min && i <= K_max
-        dist = getDist(DR);
         alpha_k = getStepSize(dist, gMaxVec);
         % get the gradient
         gradDir = getStepDir(ps, nSP, DR);
@@ -62,8 +63,13 @@ while i <= K_max
         ps = set_ps(ps, nSP);
         % get new DR
         [~, DR] = SmallSignalStability.checkSmallSignalStability(.03, ps.LA.a);
-        disp(nSP(1:nPG))
+        dist = getDist(DR);
+        fprintf('nSP ')
+        disp(nSP)
+        fprintf('DR ')
         disp(DR)
+        fprintf('dist ')
+        disp(dist)
         i = i+1;
     end
     % we are in HIC
@@ -81,12 +87,17 @@ while i <= K_max
     ps = set_ps(ps, nSP);
     % get new DR
     [~, DR] = SmallSignalStability.checkSmallSignalStability(.03,ps.LA.a);
+    dist = getDist(DR);
     % get new dist??? as well? so if we diverge from boundary we take dw
     % again to go back close to boundary
-    disp(nSP(1:nPG))
+    fprintf('nSP ')
+    disp(nSP)
+    fprintf('DR ')
     disp(DR)
+    fprintf('dist ')
+    disp(dist)
     
-    [LIDX, LOC]=ismember(nSP(1:nPG), NEW_DS_POINTS(:,1:4),'rows');
+    [LIDX, LOC]=ismember(nSP(1:nPG), NEW_DS_POINTS(:,1:nPG),'rows');
     if LIDX
         warning('PSDC:DW','New setpoint already in data set. Exiting dw.')
         break
@@ -95,14 +106,16 @@ while i <= K_max
 end
 
 % APPEND TO DATA_SET.CSV the NEW_DS_POINTS vector
-writematrix(NEW_DS_POINTS,'set_points_2.csv');
+writematrix(NEW_DS_POINTS,'set_points_case9_1.csv');
+
+util.dataSummary
 
 % cost function
 function dist = getDist(currentZeta)
 % this should be a feasibility vector?
 ZETA_MIN = 0.03;
 
-dist = ZETA_MIN - currentZeta;
+dist = abs(ZETA_MIN - currentZeta);
 end
 
 function step = getStepSize(dist,PMAX)
