@@ -8,6 +8,7 @@ output*
 out_*.txt
 fm_call.m
 
+.log/
 .data/
 _tmp/
 diary
