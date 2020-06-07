@@ -1,6 +1,6 @@
 % inputs
 %   starting point
-ACOPF_SEED = '.data/case9_ACOPF.csv';
+ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
 CASE_FILE = 'case_files/case9.m';
 PSAT_FILE = 'case_files/d_009_dyn.m';
 % % DEBUG load ACOPF_SEED, CASE_FILE, PSAT_FILE
@@ -8,7 +8,8 @@ PSAT_FILE = 'case_files/d_009_dyn.m';
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
-setPoints = acopfResults{58,:};
+% setPoints = acopfResults{100,:};
+setPoints = acopfResults{58,:}; %-> pingpoing at dist = 0.0055 
 
 % MATPOWER INIT
 MPC = loadcase(CASE_FILE);
@@ -29,7 +30,7 @@ ps.fm_abcd();
 
 
 % min distance from DR (also in getStepSize func)
-D_min = 0.01;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
+D_min = 0.0025;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
 % max number of iterations
 K_max = 1e3;
 % minimum step size ( also in get step size func)
@@ -37,7 +38,8 @@ step_min = gMaxVec.*0.0005;
 
 nDim = size(setPoints,2);
 
-
+nBuff = 3;
+buff = zeros(1,nBuff);
 NEW_DS_POINTS = [];%cell{K_max, nDim};
 
 % get current zeta
@@ -47,11 +49,20 @@ NEW_DS_POINTS = [];%cell{K_max, nDim};
 nPG = size(ps.PV.store,1);
 
 DR = curDR;
+buff(nBuff) = DR;
 nSP = setPoints;
+
+ps.PVSet(nSP);
+ps.runpsat('pf') 
+ps.fm_abcd();
+
 dist = getDist(DR);
 
 i = 1;
-% k = 1;
+DirectedWalks.plot_dw_init % ax 
+drLine = cell(K_max,1);
+drLine{i} = DirectedWalks.plotDwUpdate(i,DR,prop,nSP);
+
 while i <= K_max
     while dist > D_min && i <= K_max
         alpha_k = getStepSize(dist, gMaxVec);
@@ -60,9 +71,13 @@ while i <= K_max
         % calculate new set point
         nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values 
-        ps = set_ps(ps, nSP);
+        ps.PSet(nSP);
+        ps.runpsat('pf');
+        ps.fm_abcd();
         % get new DR
         [~, DR] = SmallSignalStability.checkSmallSignalStability(.03, ps.LA.a);
+        buff = circshift(buff,-1);
+        buff(nBuff) = DR;
         dist = getDist(DR);
         fprintf('nSP ')
         disp(nSP)
@@ -70,7 +85,12 @@ while i <= K_max
         disp(DR)
         fprintf('dist ')
         disp(dist)
+        drLine{i} = DirectedWalks.plotDwUpdate(i,DR,prop,nSP);
         i = i+1;
+        % IF WE end up pingpong ing between 2 points quit !
+        if (abs(buff(1)-buff(3)) < 1e-3)
+           warning('PSDC:DW','Stuck between 2 values, exiting') 
+        end
     end
     % we are in HIC
     % take samples around the current point
@@ -84,7 +104,9 @@ while i <= K_max
     % calculate the new set point
     nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
     % take the step: set psat object to new set point values 
-    ps = set_ps(ps, nSP);
+    ps.PSet(nSP);
+    ps.runpsat('pf');
+    ps.fm_abcd();
     % get new DR
     [~, DR] = SmallSignalStability.checkSmallSignalStability(.03,ps.LA.a);
     dist = getDist(DR);
@@ -121,14 +143,21 @@ end
 function step = getStepSize(dist,PMAX)
 % CONSTANTS
 % step related constants
-D_1 = 0.1;
-D_2 = 0.05;
-D_3 = 0.01; % D_min
+D_1 = 0.05;
+D_2 = 0.01;
+D_3 = 0.0025;%0.001; % D_min
 % epsilons
-E_1 = 0.01;
-E_2 = 0.005;
-E_3 = 0.001;
-E_4 = 0.0005;
+% EXPERIMENTAL VALUES:
+E_1 = 0.02;
+E_2 = 0.01;
+E_3 = 0.005;
+E_4 = 0.0025;
+
+% SAFE VALUES- BUT CONVERGES TOO SLOW ON MIN_DIST 0.0025
+% E_1 = 0.01;
+% E_2 = 0.005;
+% E_3 = 0.001;
+% E_4 = 0.0005;
 
 step = 0;   %#ok
 if dist > D_1
@@ -142,24 +171,15 @@ else
 end
 end
 
-function ps = set_ps(ps, setPoints)
-% set psat PG's to setPoints(1:NG) values
-% and also run power flow + abcd calculation
-PG = 4;
-nPG = size(ps.PV.store,1);
-
-generatorData = ps.PV.store;
-[~,sortIdx] = sort(generatorData(:,1));
-generatorData(sortIdx,PG) = setPoints(1:nPG);
-ps.PV.store = generatorData;
-ps.runpsat('pf');
-ps.fm_abcd();
-end
-
-function grad = getStepDir(ps, setPoints, curDR) %#ok
+function grad = getStepDir(ps, setPoints, curDR)
 % calculate SSS for 2*nPG direction of N-dimensional space
 ZETA_MIN = 0.03;
-mu = 0.05; % small perturbation applied to G
+% mu = 0.05; % small perturbation applied to G
+if ~(getDist(curDR) < 0.006)
+    mu = 0.05;
+else 
+    mu = 0.0005;
+end
 PG = 4;
 nPG = size(ps.PV.store,1);
 drs = nan(2*nPG,1);
@@ -199,12 +219,12 @@ genIdx = mod(idx,nPG);
 if genIdx == 0
     genIdx = nPG;
 end
-% Fix movement along axis
-grad = zeros(1,nPG);
-grad(genIdx) = 1;
-% the gradient will look somehting like [0 0 0 0 -1 ... 0]
-% but this means we only step into one dim at a time...
-grad = sgnDir * grad';
+% % ----- Fix movement along axis ------
+% grad = zeros(1,nPG);
+% grad(genIdx) = 1;
+% % the gradient will look somehting like [0 0 0 0 -1 ... 0]
+% % but this means we only step into one dim at a time...
+% grad = sgnDir * grad';
 
 % or with normalized gradient
 % normalize
@@ -218,6 +238,12 @@ grad = sgnDir * grad';
 % 
 % % grad = (drs - curDR)/mu;
 % % from this we have (+)/(-) direction gradient the lowest should be taken?
+
+% calculate norm gradient vector based on my shitty logic
+desiredPoint = setPoints(1:nPG);
+desiredPoint(genIdx) = desiredPoint(genIdx) + sgnDir*mu;
+gradV = desiredPoint - setPoints(1:nPG);
+grad = (gradV/(norm(gradV)))';
 end
 
 function samples = getHICSamples(ps, setPoints)
@@ -244,127 +270,58 @@ for i = 1:nPG
 end
 end
 
-function grad = getHICStepDir(ps, setPoints, curDR) %#ok MAYBE USE curDR later
-% calculate SSS for 2*nPG direction of N-dimensional space
-ZETA_MIN = 0.03;
-mu = 0.05; % small perturbation applied to G
-PG = 4;
-nPG = size(ps.PV.store,1);
-drs = nan(2*nPG,1);
-
-generatorData = ps.PV.store;
-[~,sortIdx] = sort(generatorData(:,1));
-for i = 1:nPG
-    % set PGs 
-    ddSP = setPoints(1:nPG);
-    ddSP(i) = ddSP(i) + mu;
-    generatorData(sortIdx,PG) = ddSP;
-    ps.PV.store = generatorData;
-    ps.runpsat('pf');
-    ps.fm_abcd();
-    [~, drs(i)] = SmallSignalStability.checkSmallSignalStability(ZETA_MIN, ps.LA.a);
-end
-% same but for - direction
-for i = 1:nPG
-    % set PGs 
-    ddSP = setPoints(1:nPG);
-    ddSP(i) = ddSP(i) - mu;
-    generatorData(sortIdx,PG) = ddSP;
-    ps.PV.store = generatorData;
-    ps.runpsat('pf');
-    ps.fm_abcd();
-    [~, drs(i+nPG)] = SmallSignalStability.checkSmallSignalStability(ZETA_MIN, ps.LA.a);
-end
-% we have a vector of all surrounding Zetas
-% calculate the value & idx of direction that minimizes the distance where
-% the distance is minimal from ZETA MIN
-[~,idx] = min(abs(ZETA_MIN - drs)); 
-% if sgnDir == 1 the dir = (+) else dir = (-)
-sgnDir = (idx/nPG) <= 1;
-if ~sgnDir
-    sgnDir = -1;
-end
-genIdx = mod(idx,nPG);
-if genIdx == 0
-    genIdx = nPG;
-end
-% Fix movement along axis
-grad = zeros(nPG,1);
-grad(genIdx) = 1;
-% the gradient will look somehting like [0 0 0 0 -1 ... 0]
-% but this means we only step into one dim at a time...
-grad = sgnDir * grad;
-
-end
-
-
-function grad = getStepDir2(ps, setPoints, curDR) 
-% calculate SSS for 2*nPG direction of N-dimensional space
-ZETA_MIN = 0.03;
-%mu = 0.05; % small perturbation applied to G
-mu = 0.0001; %this should be smaller than d_min right????
-PG = 4;
-nPG = size(ps.PV.store,1);
-drs = nan(2*nPG,1);
-% drs = nan(nPG,1);
-generatorData = ps.PV.store;
-[~,sortIdx] = sort(generatorData(:,1));
-for i = 1:nPG
-    % set PGs 
-    ddSP = setPoints(1:nPG);
-    ddSP(i) = ddSP(i) + mu;
-    generatorData(sortIdx,PG) = ddSP;
-    ps.PV.store = generatorData;
-    ps.runpsat('pf');
-    ps.fm_abcd();
-    [~, drs(i)] = SmallSignalStability.checkSmallSignalStability(ZETA_MIN, ps.LA.a);
-end
-% % same but for - direction
-for i = 1:nPG
-    % set PGs 
-    ddSP = setPoints(1:nPG);
-    ddSP(i) = ddSP(i) - mu;
-    generatorData(sortIdx,PG) = ddSP;
-    ps.PV.store = generatorData;
-    ps.runpsat('pf');
-    ps.fm_abcd();
-    [~, drs(i+nPG)] = SmallSignalStability.checkSmallSignalStability(ZETA_MIN, ps.LA.a);
-end
-% we have a vector of all surrounding Zetas
-% calculate the value & idx of direction that minimizes the distance
-[~,idx] = min(abs(getDist(drs)));
-% if sgnDir == 1 the dir = (+) else dir = (-)
-sgnDir = (idx/nPG) <= 1;
-if ~sgnDir
-    sgnDir = -1;
-end
-genIdx = mod(idx,nPG);
-if genIdx == 0
-    genIdx = nPG;
-end
-% % % Fix movement along axis
-grad = zeros(1,nPG);
-
-% % % the gradient will look somehting like [0 0 0 0 -1 ... 0]
-% % % but this means we only step into one dim at a time...
-% % grad = sgnDir * grad;
-
-% or with normalized gradient
-% normalize
-% % grad = (ZETA_MIN - drs)/norm(ZETA_MIN - drs);
-
-% % ----- the real-real mathemtcal gradient -----
-% %
-% %      d f(a)   f(a+h) - f(a)
-% % m = ------ = ---------------
-% %       d a          h
+% function grad = getHICStepDir(ps, setPoints, curDR) %#ok MAYBE USE curDR later
+% % calculate SSS for 2*nPG direction of N-dimensional space
+% ZETA_MIN = 0.03;
+% mu = 0.05; % small perturbation applied to G
+% PG = 4;
+% nPG = size(ps.PV.store,1);
+% drs = nan(2*nPG,1);
 % 
-grad2 = (drs - curDR)/mu;
-grad(genIdx) = grad2(idx);
-grad = grad';
-% % from this we have (+)/(-) direction gradient the lowest should be taken?
-end
-
+% generatorData = ps.PV.store;
+% [~,sortIdx] = sort(generatorData(:,1));
+% for i = 1:nPG
+%     % set PGs 
+%     ddSP = setPoints(1:nPG);
+%     ddSP(i) = ddSP(i) + mu;
+%     generatorData(sortIdx,PG) = ddSP;
+%     ps.PV.store = generatorData;
+%     ps.runpsat('pf');
+%     ps.fm_abcd();
+%     [~, drs(i)] = SmallSignalStability.checkSmallSignalStability(ZETA_MIN, ps.LA.a);
+% end
+% % same but for - direction
+% for i = 1:nPG
+%     % set PGs 
+%     ddSP = setPoints(1:nPG);
+%     ddSP(i) = ddSP(i) - mu;
+%     generatorData(sortIdx,PG) = ddSP;
+%     ps.PV.store = generatorData;
+%     ps.runpsat('pf');
+%     ps.fm_abcd();
+%     [~, drs(i+nPG)] = SmallSignalStability.checkSmallSignalStability(ZETA_MIN, ps.LA.a);
+% end
+% % we have a vector of all surrounding Zetas
+% % calculate the value & idx of direction that minimizes the distance where
+% % the distance is minimal from ZETA MIN
+% [~,idx] = min(abs(ZETA_MIN - drs)); 
+% % if sgnDir == 1 the dir = (+) else dir = (-)
+% sgnDir = (idx/nPG) <= 1;
+% if ~sgnDir
+%     sgnDir = -1;
+% end
+% genIdx = mod(idx,nPG);
+% if genIdx == 0
+%     genIdx = nPG;
+% end
+% % Fix movement along axis
+% grad = zeros(nPG,1);
+% grad(genIdx) = 1;
+% % the gradient will look somehting like [0 0 0 0 -1 ... 0]
+% % but this means we only step into one dim at a time...
+% grad = sgnDir * grad;
+% 
+% end
 
 
 

@@ -4,16 +4,18 @@ t = tic;
 % ACOPF_SEED = '.data/case14_ACOPF.csv';
 % CASE_FILE = 'case_files/case14.m';
 % PSAT_FILE = 'case_files/d_014_dyn_mdl_pretty.m';
-ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv'; %'set_points_case9_58.csv';%'set_points_case9_100.csv';%.data/case9_ACOPF.csv';
+ACOPF_SEED = 'set_points_case9_1.csv';%'.data/case9_2020_06_03T162628Z/case9_ACOPF.csv'; %'set_points_case9_58.csv';%'set_points_case9_100.csv';%.data/case9_ACOPF.csv';
 CASE_FILE = 'case_files/case9.m';
 PSAT_FILE = 'case_files/d_009_dyn.m';
 
 % df = 'set_points_2.csv';
 % % columns are sorted already
 % dwResults = readtable(df, 'ReadVariableNames',false);
-acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
+% acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
+acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',false);
+
 % Sort columns
-acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
+%acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
 dwResults = acopfResults;
 
 
