@@ -52,7 +52,13 @@ Upon installation of psat add the psat folder (and its subfolders) to the
 MATLAB path. Make sure to **add PSAT to the bottom** of your MATLAB path list
 otherwise internal MATLAB settings will be shadowed.
 
-
+# Tests
+To check if all (MATLAB) dependencies are properly installed run
+```matlab
+import matlab.unittest.TestSuite;
+suite = TestSuite.fromPackage('test')
+res = run(suite)
+```
 
 
 
