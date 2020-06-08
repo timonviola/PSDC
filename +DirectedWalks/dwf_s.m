@@ -1,10 +1,12 @@
 % inputs
 %   starting point
-ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
-CASE_FILE = 'case_files/case9.m';
-PSAT_FILE = 'case_files/d_009_dyn.m';
-% % DEBUG load ACOPF_SEED, CASE_FILE, PSAT_FILE
-% load +test\debug_const.mat
+% ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
+% CASE_FILE = 'case_files/case9.m';
+% PSAT_FILE = 'case_files/d_009_dyn.m';
+
+ACOPF_SEED = '.data/case14_2020_06_08T110325Z/case14_ACOPF.csv';%'.data/case9_ACOPF.csv';
+CASE_FILE = 'case_files/case14.m';
+PSAT_FILE = 'case_files\d_014_dyn_mdl_pretty.m';
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
@@ -130,7 +132,7 @@ end
 % APPEND TO DATA_SET.CSV the NEW_DS_POINTS vector
 writematrix(NEW_DS_POINTS,'set_points_case9_1.csv');
 
-util.dataSummary
+util.dataSummary('set_points_case9_1.csv',PSAT_FILE,CASE_FILE)
 
 % cost function
 function dist = getDist(currentZeta)
