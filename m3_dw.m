@@ -1,9 +1,11 @@
 % parallel directed walks
 t2 = tic;
-ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';
+ACOPF_SEED = '.data/case9_2020_06_08T144804Z/case9_ACOPF.csv';
 PSAT_FILE = ['case_files' filesep 'd_009_dyn.m'];
 CASE_NAME = 'case9';
 CASE_FILE = [pwd filesep 'case_files' filesep CASE_NAME '.m'];
+
+util.add_dependencies
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 % Sort columns
@@ -32,8 +34,8 @@ if ispc
     end
 else
     % load the default cluster profile
-    clust=parcluster(dccClusterProfile());
-    numw = 100;
+    clust=parcluster('clusterProfileElektro2019');
+    numw = 8;
     p = parpool(clust, numw);
 end
 disp(p)
