@@ -1,4 +1,4 @@
-%%
+function printDataSummary(stable, classDetails)
 % overall stat
 fprintf('\n<strong>Summary</strong>\n')
 fprintf(pad('',25,'right','-'))
