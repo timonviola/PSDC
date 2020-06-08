@@ -3,17 +3,26 @@ if ~ispc
     util.add_dependencies
 end
 t = tic;
-CASE_NAME = 'case9';%'case39';%'case14';
-CASE_FILE = [pwd filesep 'case_files' filesep 'case9.m'];
+% MATPOWER case files
+% other case files:
+% 'case39';
+% 'case14';
+% 'case9';
+CASE_NAME = 'case14';
+CASE_FILE = [pwd filesep 'case_files' filesep CASE_NAME '.m'];
 % PSAT file name        (dynamic data)
-PSAT_FILE = ['case_files' filesep 'd_009_dyn.m'];% 'd_IEEE39bus.m'];%'d_014_dyn_mdl_pretty.m'];%'d_009_dyn.m'];
+% other possible case files:
+%   'd_IEEE39bus.m'];
+%   'd_014_dyn_mdl_pretty.m'];
+%   'd_009_dyn.m'];
+PSAT_FILE = ['case_files' filesep 'd_014_dyn_mdl_pretty.m'];
 % get current timestamp
 TS = timestamp;
 OUT_DIR = ['.data' filesep CASE_NAME '_' TS];
 %%
 [status, msg, msgID] = mkdir(OUT_DIR);
 if ~status
-   error('PSCD:base',msg); 
+   error('PSCD:base',msg);
 end
 %% Load matpower case
 % MATPOWER file name    (opf data)
@@ -61,3 +70,12 @@ if stat
 end
 
 % This can be run only locally!
+
+% ------
+% TODO:
+% ssh to hpc
+% create out dir in PSDC
+% scp the _QCRM_ file
+% submit job script to run ACOPF checks
+% submit job to run DWs
+
