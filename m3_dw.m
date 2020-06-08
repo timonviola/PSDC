@@ -1,7 +1,22 @@
 % parallel directed walks
 t2 = tic;
+ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';
+PSAT_FILE = ['case_files' filesep 'd_009_dyn.m'];
+CASE_NAME = 'case9';
+CASE_FILE = [pwd filesep 'case_files' filesep CASE_NAME '.m'];
+
+acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
+% Sort columns
+acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
+
+% Check for repeated data in acopfResults:
+[C, ia, ic]= unique(acopfResults,'stable');
+if size(C) == size(acopfResults)
+    warning('some acopf values are doubled')
+end
 % boolean classification - feasible = 1, infeasible = 0
-N = size(acopfResults,1);
+% N = size(acopfResults,1);
+N = 10;
 stable = nan(N,1);
 % criteria fail/pass details [PG QG VM S_{flow}]
 classDetails = cell(N,1);

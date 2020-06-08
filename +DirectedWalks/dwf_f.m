@@ -27,7 +27,7 @@ ps.fm_abcd();
 % min distance from DR (also in getStepSize func)
 D_min = 0.0025;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
 % max number of iterations
-K_max = 1e3;
+K_max = 1e2;
 % minimum step size ( also in get step size func)
 step_min = gMaxVec.*0.0005;
 
@@ -75,20 +75,20 @@ while i <= K_max
         buff = circshift(buff,-1);
         buff(nBuff) = DR;
         dist = getDist(DR);
-        fprintf('nSP ')
-        disp(nSP)
-        fprintf('DR ')
-        disp(DR)
-        fprintf('dist ')
-        disp(dist)
+%         fprintf('nSP ')
+%         disp(nSP)
+%         fprintf('DR ')
+%         disp(DR)
+%         fprintf('dist ')
+%         disp(dist)
         if PRINT
             drLine{i} = DirectedWalks.plotDwUpdate(i,DR,prop,nSP);
         end
         i = i+1;
         % IF WE end up pingpong ing between 2 points quit !
-        if (abs(buff(1)-buff(3)) < 1e-3)
-            warning('PSDC:DW','Stuck between 2 values, exiting')
-        end
+%         if (abs(buff(1)-buff(3)) < 1e-3)
+%             warning('PSDC:DW','Stuck between 2 values, exiting')
+%         end
     end
     % we are in HIC
     % take samples around the current point
@@ -110,12 +110,12 @@ while i <= K_max
     dist = getDist(DR);
     % get new dist??? as well? so if we diverge from boundary we take dw
     % again to go back close to boundary
-    fprintf('nSP ')
-    disp(nSP)
-    fprintf('DR ')
-    disp(DR)
-    fprintf('dist ')
-    disp(dist)
+%     fprintf('nSP ')
+%     disp(nSP)
+%     fprintf('DR ')
+%     disp(DR)
+%     fprintf('dist ')
+%     disp(dist)
     
     [LIDX, ~]=ismember(nSP(1:nPG), NEW_DS_POINTS(:,1:nPG),'rows');
     if LIDX
