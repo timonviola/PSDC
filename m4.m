@@ -1,6 +1,7 @@
 % fit a normal distribution to feasible points
 load('.data\case9_2020_06_08T144804Z\unified_case9_summary.mat')
 setpoints = readmatrix(".data\case9_2020_06_08T144804Z\unified_case9.csv","Delimiter",",");
+NSAMPLES = 1e5;
 %  
 %
 idxStablePoints = (stable == 1);
@@ -47,13 +48,14 @@ mu = mean(stablePoints);
 rng('default')
 % get random samples
 % Ref: https://se.mathworks.com/help/stats/mvnrnd.html
-R = mvnrnd(mu,sigma,100);
 
+R = mvnrnd(mu,sigma,NSAMPLES);
 
+fprintf('Sampled %d points \n',NSAMPLES)
 %% check results
 CASE_FILE = 'case_files/case9.m';
 PSAT_FILE = 'case_files/d_009_dyn.m';
-fname = 'tmp_rnd_samples.csv';
+fname = 'tmp_1e5_rnd_samples.csv';
 writematrix(R,fname);
 
 util.dataSummary(fname,PSAT_FILE,CASE_FILE)
