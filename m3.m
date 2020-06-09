@@ -1,4 +1,4 @@
-% this is more like m4 - after directed walks we check for everything
+% this is more like m5 - after directed walks and sampling we check for everything
 %% SSS, Directed walks
 % Check each setpoint from the previous section. The following criteria has
 % to be satisfied to add to the data set as a feasible point (1):

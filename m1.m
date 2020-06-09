@@ -24,6 +24,7 @@ OUT_DIR = ['.data' filesep CASE_NAME '_' TS];
 if ~status
    error('PSCD:base',msg);
 end
+
 %% Load matpower case
 % MATPOWER file name    (opf data)
 
