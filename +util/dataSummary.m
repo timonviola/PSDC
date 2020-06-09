@@ -56,8 +56,8 @@ if ispc
     end
 else
     % load the default cluster profile
-    clust=parcluster(dccClusterProfile());
-    numw = 16;
+    clust=parcluster('clusterProfileElektro2019');
+    numw = 64;
     p = parpool(clust, numw);
 end
 disp(p)
@@ -70,7 +70,6 @@ else
 end
 p.addAttachedFiles(psatFile);
 p.addAttachedFiles(mpFile);
-
 
 % Check all SP's small signal stability
 % Progressbar that shows on STDOUT
