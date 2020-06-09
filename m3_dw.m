@@ -1,6 +1,7 @@
 % parallel directed walks
 t2 = tic;
-ACOPF_SEED = '.data/case9_2020_06_08T144804Z/case9_ACOPF.csv';
+OUT_DIR = '.data/case9_2020_06_08T144804Z/';
+ACOPF_SEED = [OUT_DIR 'case9_ACOPF.csv'];
 PSAT_FILE = ['case_files' filesep 'd_009_dyn.m'];
 CASE_NAME = 'case9';
 CASE_FILE = [pwd filesep 'case_files' filesep CASE_NAME '.m'];
@@ -17,8 +18,8 @@ if size(C) == size(acopfResults)
     warning('some acopf values are doubled')
 end
 % boolean classification - feasible = 1, infeasible = 0
-% N = size(acopfResults,1);
-N = 10;
+N = size(acopfResults,1);
+
 stable = nan(N,1);
 % criteria fail/pass details [PG QG VM S_{flow}]
 classDetails = cell(N,1);
@@ -55,7 +56,7 @@ pw = textBar(N,'Parallel Directed walks');
 parfor i = 1:N
     writematrix( ...
         DirectedWalks.dwf_f(acopfResults{i,:},PSAT_FILE,CASE_FILE),...
-        ['set_points_case' CASE_NAME '_' num2str(i) '.csv']);
+        [OUT_DIR 'dw_set_points' CASE_NAME '_' num2str(i) '.csv']);
    increment(pw)
 end
 
