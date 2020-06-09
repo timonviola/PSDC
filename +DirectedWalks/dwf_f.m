@@ -30,7 +30,6 @@ D_min = 0.0025;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
 K_max = 1e2;
 % minimum step size ( also in get step size func)
 step_min = gMaxVec.*0.0005;
-
 nDim = size(setPoint,2);
 
 nBuff = 3;
@@ -40,20 +39,46 @@ NEW_DS_POINTS = [];%cell{K_max, nDim};
 % get current zeta
 [~, curDR] = SmallSignalStability.checkSmallSignalStability(.03, ps.LA.a);
 
+i = 1;
+
 % number of generators except slack
 nPG = size(ps.PV.store,1);
-
 DR = curDR;
+dist = getDist(DR);
 buff(nBuff) = DR;
 nSP = setPoint;
-
 ps.PVSet(nSP);
 ps.runpsat('pf')
 ps.fm_abcd();
 
-dist = getDist(DR);
+% ------ preliminary set point check ------
+% This check is neccessary in case that the OPF constraints are stricter
+% than SSS. OPF limit violations are checked, if it cannot be enforced with
+% the given voltage limits the DW quits, this acopf seed is discarded.
 
-i = 1;
+% check if nSP is OPF feasible
+res = ps.powerFlowResults;
+[opfStab, opfDet] = DirectedWalks.checkOPFLimits(MPC, res);
+if ~opfStab
+    warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
+        'Retry with enforced Q-limits.\nPG QG VM Sf\n' num2str(opfDet)])
+    nSP = util.nearestOptim(MPC,nSP);
+    ps.PVSet(nSP);
+    % enforce q limits
+    ps.Settings.pv2pq = 1;
+    ps.runpsat('pf')
+    ps.fm_abcd();
+    res = ps.powerFlowResults;
+    [opfStab, opfDet] = DirectedWalks.checkOPFLimits(MPC, res);
+    if ~opfStab
+        warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
+            'Quitting directed walk.\nPG QG VM Sf\n' num2str(opfDet)])
+        % quit DW
+        return
+    end
+end
+
+
 if PRINT
     DirectedWalks.plot_dw_init % ax
     drLine = cell(K_max,1);
