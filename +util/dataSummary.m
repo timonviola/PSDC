@@ -87,6 +87,7 @@ toc(t2)
 
 fname = strsplit(setPointsCsv,'.');
 save([fname{1}  '_summary.mat'],'stable','classDetails','dampingRatio')
+fprintf('Results are saved as %s\n\n',[fname{1}  '_summary.mat']);
 
 %% print
 util.printDataSummary(stable, classDetails)
