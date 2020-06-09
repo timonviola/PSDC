@@ -1,5 +1,5 @@
 %CHECKOPFLIMITS Check OPF limits.
-%   CHECKOPFLIMITS(matpowerCase, powerFlowResults) checks if pf results
+%   CHECKOPFLIMITS(matpowerCaseStruct, powerFlowResults) checks if pf results
 %   are within matpowerCase limits.
 %   Check 4 most critical contingencies:
 %     o Pg generator real power
