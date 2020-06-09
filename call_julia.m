@@ -1,4 +1,4 @@
-%   ----- local -----
+%   ----- local ----- m1
 clear
 if ~ispc
     util.add_dependencies
@@ -61,7 +61,7 @@ if stat
     error('PSDC:julia','Something went wrong.')
 end
 %   ----- HPC -----
-%% ACOPF checks on samples
+%% ACOPF checks on samples - m2
 % Run a modified ACOPF on all the samples
 
 % Output file of acopf setpoints
@@ -88,7 +88,7 @@ toc(t)
 fprintf('All done\n')
 
 
-%% SSS, Directed walks
+%% SSS, Directed walks - m3
 % Check each setpoint from the previous section. The following criteria has
 % to be satisfied to add to the data set as a feasible point (1):
 %   o  ACOPF limits are not violated
