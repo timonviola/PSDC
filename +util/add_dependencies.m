@@ -1,4 +1,4 @@
-% HPC only
+% HPC only - add dependencies to MATLAB path.
 
 % matpower
 addpath(genpath('~/thesis/matpower6.0/'))

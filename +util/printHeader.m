@@ -1,3 +1,4 @@
+% PRINTHEADER Print ASCII table header.
 function printHeader(varargin)
 if nargin > 2
    tFormat = varargin{3};

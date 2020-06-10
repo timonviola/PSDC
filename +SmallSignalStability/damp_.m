@@ -1,3 +1,4 @@
+% DAMP_ Natural frequency and damping of linear system dynamics.
 function varargout = damp_(As)
 % DAMP_ Natural frequency and damping of linear system dynamics.
 % [Wn,Z,P] = DAMP_(AS) also returns the poles P of SYS.

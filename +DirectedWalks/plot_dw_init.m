@@ -1,3 +1,4 @@
+% Initialize directed walk progress plot.
 f = figure('WindowStyle','docked');
 ax = axes;
 hold on

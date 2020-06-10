@@ -1,3 +1,4 @@
+% Norm calculation benchmar script.
 ACOPF_SEED = '.data/case14_ACOPF.csv';
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));

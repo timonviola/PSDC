@@ -8,20 +8,20 @@
 % algorithm runs parallel starting from each S.
 % Starting from S the algorithm starts to CHECK into each direction
 % at the first stable point it steps into this direction.
-
-
+% 
+% 
 % o CHECK
 %   Evaluate feasibility of the setpoint (e.g.: SSS and AC-OPF)
 %
 % o STOPPING CRITERIA
 %   R violation - a neighbouring S (seeds) radius is reached
 %   W violation - W /Omega/ number of samples are reached
-
-
-
-
-
-
+% 
+% 
+% 
+% 
+% 
+% 
 % mu    - step size (constant for now)
 % mu_s  - sub step size (constant for now)
 % S     - starting points (seeds)

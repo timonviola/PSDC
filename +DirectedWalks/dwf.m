@@ -1,4 +1,4 @@
-% Directed walk algorithm
+% Directed walk algorithm specification.
 % From: Efficient Database Generation for Data-driven
 %       Security Assessment of Power Systems
 %
@@ -44,8 +44,8 @@
 %   sensitivity of the damping ratio zeta. This is obtained by calculating
 %   the EIGENVALUE SENSITIVITY (of the most critical case's system matrix).
 %   But this is computationally too hard so we don't do this.
-
-
+% 
+% 
 % alpha     - variable step size
 % d         - distance from security boundary
 % gamma     - security boundary

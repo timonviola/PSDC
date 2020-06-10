@@ -1,5 +1,7 @@
 function printDataSummary(stable, classDetails)
-% overall stat
+% PRINTDATASUMMARY Formatted output of plotDataSummary.
+% See also UTIL.PLOTDATASUMMARY
+
 fprintf('\n<strong>Summary</strong>\n')
 fprintf(pad('',25,'right','-'))
 fprintf('\nNumber of points:%22d\n',length(stable))

@@ -85,3 +85,5 @@ edit m3_dw m4
 help +util
 help +test
 help +DirectedWalks
+help +SmallSignalStability
+help DirectedWalks.checkOPFLimits

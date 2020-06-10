@@ -1,5 +1,6 @@
 function NEW_DS_POINTS = dwf_f(setPoint, PSAT_FILE, CASE_FILE,varargin)
-
+% DWF_F Directed walk function.
+% See also DIRECTEDWALKS.DWF
 PRINT = false;
 if nargin > 3
     if strcmp(varargin{1},'print')

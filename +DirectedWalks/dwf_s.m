@@ -1,4 +1,6 @@
-% inputs
+% Directed walk algorithm script.
+% See also DIRECTEDWALKS.DWF
+
 %   starting point
 % ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
 % CASE_FILE = 'case_files/case9.m';

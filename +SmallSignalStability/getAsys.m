@@ -1,3 +1,4 @@
+% DEPRECATED 
 function Asys = getAsys()
 % GETASYS return system matrix.
 %

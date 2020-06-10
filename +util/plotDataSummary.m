@@ -1,3 +1,4 @@
+% PLOTDATASUMMARY Create data summary plot.
 % TODO: it will be interesting to see how well these points cover the
 % feasible space OR/AND the n-dim unit cube.
 % TODO: what is the minimum/average/maximum distance of OPs
