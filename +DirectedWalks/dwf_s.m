@@ -313,6 +313,17 @@ for i = 1:nPG
 end
 end
 
+function alpha = getAlpha(MPC)
+% should alpha be the same in every dim?
+PMAX = 9;
+PMIN = 10;
+MPC.gen(:,[9,10])
+genRanges = MPC.gen(:,[9,10])./MPC.baseMVA;
+
+end
+
+
+end
 
 
 
