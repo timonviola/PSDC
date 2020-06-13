@@ -49,6 +49,7 @@ end
 p.addAttachedFiles(PSAT_FILE);
 p.addAttachedFiles(CASE_FILE);
 
+%% TODO: check for duplicates
 
 %% Add first set to data-set
 % Progressbar that shows on STDOUT
