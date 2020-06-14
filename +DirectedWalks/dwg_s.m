@@ -1,12 +1,12 @@
-% DWF_S Development implementation of brute force directed walk algorithm.
-% DWF_S is a heavily modified version of the core algorithm that has
+% DWF_G Development implementation of brute force directed walk algorithm.
+% DWF_G is a heavily modified version of the core algorithm that has
 % multiple break hooks in case of a stuck descent.
 %
 % This script is used to develop/modify the core algorithm. It implements
 % debugging, step-by-step plotting and saving the plots as GIF.
 %
 % For detailed mathematical description of the algorithm
-% See also DIRECTEDWALKS.DWF
+% See also DIRECTEDWALKS.DWG
 
 %   starting point
 % ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
@@ -23,7 +23,7 @@ acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
 setPoint = acopfResults{100,:}; %-> pingpoing at dist = 0.0055 
 
 % enable plotting
-PRINT = false;
+PRINT = true;
 % wrtie gif from plot
 GIF = false;
 % enable pf printing
@@ -140,7 +140,7 @@ while i <= K_max
     while dist > D_min && i <= K_max
         alpha_k = getStepSize(dist, gMaxVec,'epsLims',E,'dLims',D);
         % get the gradient
-        [gradDir, im] = getStepDir(ps, nSP, DR,'print',PRINT,'imwrite',im);
+        [gradDir, im] = getGreedy(ps, nSP, DR,'print',PRINT,'imwrite',im);
         % calculate new set point
         nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values
@@ -190,7 +190,7 @@ while i <= K_max
     % take the next step with the minimum step size -> no step size calc
     % take the next step to the direction where the DR stays the same/close
     %     gradDir = getHICStepDir(ps, nSP, DR);
-    [gradDir,im] = getStepDir(ps, nSP, DR, 'print',PRINT,'imwrite',im);
+    [gradDir,im] = getGreedy(ps, nSP, DR, 'print',PRINT,'imwrite',im);
     alpha_k = step_min;
     % calculate the new set point
     nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';

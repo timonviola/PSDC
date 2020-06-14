@@ -1,4 +1,4 @@
-function [grad,varargout] = getStepDir(ps, setPoints, curDR, varargin)
+function [grad,varargout] = getGreedy(ps, setPoints, curDR, varargin)
 % GETSTEPDIR Return the gradient of the new step.
 % calculate SSS for 2*nPG direction of N-dimensional space
 %

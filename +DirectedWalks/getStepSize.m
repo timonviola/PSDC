@@ -33,8 +33,8 @@ EDefault(4) = 0.0025;
 p = inputParser;
 addRequired(p,'dist',@(x) isnumeric(x) && isscalar(x))
 addRequired(p,'PMAX',@(x) isnumeric(x) && isvector(x))
-addParameter(p,'dLims',DDefault, @(x) isnumeric(x) && iscolumn(x));
-addParameter(p,'epsLims',EDefault, @(x) isnumeric(x) && iscolumn(x));
+addParameter(p,'dLims',DDefault, @(x) isnumeric(x) && isvector(x));
+addParameter(p,'epsLims',EDefault, @(x) isnumeric(x) && isvector(x));
 parse(p,dist,PMAX,varargin{:})
 dist = p.Results.dist;
 PMAX = p.Results.PMAX;
