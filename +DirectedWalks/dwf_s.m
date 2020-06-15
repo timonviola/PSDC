@@ -23,9 +23,9 @@ acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
 setPoint = acopfResults{68,:}; %-> pingpoing at dist = 0.0055 
 
 % enable plotting
-PRINT = true;
+PRINT = false;
 % wrtie gif from plot
-GIF = true;
+GIF = false;
 % enable pf printing
 POT = {};
 if PRINT
