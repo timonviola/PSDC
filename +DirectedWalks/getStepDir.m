@@ -118,7 +118,7 @@ end
 % % grad = (drs - curDR)/mu;
 % % from this we have (+)/(-) direction gradient the lowest should be taken?
 
-% calculate norm gradient vector based on my shitty logic
+
 desiredPoint = setPoints(1:nPG);
 desiredPoint(genIdx) = desiredPoint(genIdx) + sgnDir*mu;
 gradV = desiredPoint - setPoints(1:nPG);
