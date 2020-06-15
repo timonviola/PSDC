@@ -20,7 +20,7 @@ ax.XLim = [-0.10 0.10];
 hicU = xline(0.0325,':','linewidth',1.5,'color','#ffc107','DisplayName','HIC');
 hicL = xline(0.0275,':','linewidth',1.5,'color','#ffc107','HandleVisibility','off');
 
-ax.YLim = [0,20];
+ax.YLim = [0,30];
 
 prop = DirectedWalks.plot.unfeasibleProps();
 unFes = plot(0,0,prop{:},'Visible','off');

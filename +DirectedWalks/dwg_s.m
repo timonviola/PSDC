@@ -9,23 +9,23 @@
 % See also DIRECTEDWALKS.DWG
 
 %   starting point
-% ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
-% CASE_FILE = 'case_files/case9.m';
-% PSAT_FILE = 'case_files/d_009_dyn.m';
+ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
+CASE_FILE = 'case_files/case9.m';
+PSAT_FILE = 'case_files/d_009_dyn.m';
 
-ACOPF_SEED = '.data/case14_2020_06_08T110325Z/case14_ACOPF.csv';%'.data/case9_ACOPF.csv';
-CASE_FILE = 'case_files/case14.m';
-PSAT_FILE = 'case_files\case14_matpower_limits.m';
+% ACOPF_SEED = '.data/case14_2020_06_08T110325Z/case14_ACOPF.csv';%'.data/case9_ACOPF.csv';
+% CASE_FILE = 'case_files/case14.m';
+% PSAT_FILE = 'case_files\case14_matpower_limits.m';
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
 % setPoints = acopfResults{100,:};
-setPoint = acopfResults{100,:}; %-> pingpoing at dist = 0.0055 
+setPoint = acopfResults{68,:}; %-> pingpoing at dist = 0.0055 
 
 % enable plotting
 PRINT = true;
 % wrtie gif from plot
-GIF = false;
+GIF = true;
 % enable pf printing
 POT = {};
 if PRINT
@@ -44,15 +44,15 @@ t1 = tic;
 D_min = 0.0025;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
 % max number of iterations
 K_max = 1e2;
-SmallestStepSizeScale = 0.0005;
-E(1) = 0.2;
-E(2) = 0.1;
-E(3) = 0.05;
-E(4) = 0.025;
-
-D(1) = 0.07;
-D(2) = 0.032;
-D(3) = 0.0095;
+SmallestStepSizeScale = 0.005;
+% E(1) = 0.2;
+% E(2) = 0.1;
+% E(3) = 0.05;
+% E(4) = 0.025;
+% 
+% D(1) = 0.07;
+% D(2) = 0.032;
+% D(3) = 0.0095;
 
 % ------ PSAT/MATPOWER initialization ------
 % MATPOWER INIT
@@ -82,7 +82,7 @@ nDim = size(setPoint,2);
 i = 1;
 % shift register that tracks if dw is stuck
 nBuff = 5;
-buff = zeros(1,nBuff);
+buff = rand(1,nBuff);
 % array of set points
 NEW_DS_POINTS = [];%cell{K_max, nDim};
 % get current zeta
@@ -130,6 +130,7 @@ EXIT = false;
 im = {};
 if PRINT
     [fig, ax, prop] = plot.plotDWInit('legend',true); % ax
+    [etH, et] = plot.addTimeElapsedBox(fig);
     drLine = cell(K_max,1);
     drLine{i} = plot.plotDwUpdate(ax,0,DR,prop,nSP);
     feasProp = plot.greenProps();
@@ -138,7 +139,9 @@ if PRINT
 end
 while i <= K_max
     while dist > D_min && i <= K_max
-        alpha_k = getStepSize(dist, gMaxVec,'epsLims',E,'dLims',D);
+%         alpha_k = getStepSize(dist, gMaxVec);%,'epsLims',E,'dLims',D);
+        alpha_k = step_min;
+        
         % get the gradient
         [gradDir, im] = getGreedy(ps, nSP, DR,'print',PRINT,'imwrite',im);
         % calculate new set point
@@ -159,6 +162,7 @@ while i <= K_max
 %         fprintf('dist ')
 %         disp(dist)
         if PRINT
+            etH.String = ['Elapsed time: ' util.getTimeElapsed(et)];
             drLine{i} = plot.plotDwUpdate(ax,i,DR,prop,nSP);
             frame = getframe(gcf);
             imIdx = length(im)+1;
@@ -183,6 +187,7 @@ while i <= K_max
     if EXIT
         break
     end
+    step_min = gMaxVec.*0.005;
     % we are in HIC
     % take samples around the current point
     NEW_DS_POINTS = [NEW_DS_POINTS; nSP];                   %#ok FOR NOW DO NOT PREALLOCATE
@@ -202,6 +207,7 @@ while i <= K_max
     [~, DR] = SmallSignalStability.checkSmallSignalStability(.03,ps.LA.a);
     dist = getDist(DR);
     if PRINT
+        etH.String = ['Elapsed time: ' util.getTimeElapsed(et)];
         drLine{i} = plot.plotDwUpdate(ax,i,DR,feasProp,nSP);
         frame = getframe(gcf);
         imIdx = length(im)+1;
@@ -234,9 +240,9 @@ if PRINT && GIF
     for idx = 1:nImages
         [A,map] = rgb2ind(im{idx},256);
         if idx == 1
-            imwrite(A,map,filename,'gif','LoopCount',Inf,'DelayTime',0.05);
+            imwrite(A,map,filename,'gif','LoopCount',1,'DelayTime',0.1);
         else
-            imwrite(A,map,filename,'gif','WriteMode','append','DelayTime',0.05);
+            imwrite(A,map,filename,'gif','WriteMode','append','DelayTime',0.1);
         end
     end
 end

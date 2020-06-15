@@ -18,12 +18,16 @@ zetaMin = p.Results.zetaMin;
 PRINT = p.Results.print;
 im = p.Results.imwrite;
 
-% mu = 0.05; % small perturbation applied to G
-% if ~(getDist(curDR) < 0.006)
-%     mu = 0.05;
-% else
-    mu = 0.0005;
-% end
+
+% small perturbation applied to G
+mu = 0.0005;
+% if dist is <= than this, we take it
+curDist = getDist(curDR);
+GREEDTOL = 0.99995;
+% GREEDTOL = 1;
+isInGreedyTol = @(x) getDist(x) <= curDist*GREEDTOL;
+% GREEDYQUIT = false;
+
 PG = 4;
 nPG = size(ps.PV.store,1);
 drs = nan(2*nPG,1);
@@ -47,6 +51,7 @@ for i = 1:nPG
     ps.runpsat('pf');
     ps.fm_abcd();
     [~, drs(i)] = SmallSignalStability.checkSmallSignalStability(zetaMin, ps.LA.a);
+    % ----- PRINT -----
     if PRINT
         % calculate angle (in rad)
         delta = pi/(nPG+1) * i;
@@ -59,10 +64,12 @@ for i = 1:nPG
         imIdx = length(im)+1;
         im{imIdx} = frame2im(frame);
     end
-end
-% % same but for - direction
-for i = 1:nPG
-    % set PGs
+     % ---- GREED -----
+    if isInGreedyTol(drs(i))
+%         GREEDYQUIT = true;
+        break
+    end
+    % ----- Check [-] direction -----
     ddSP = setPoints(1:nPG);
     ddSP(i) = ddSP(i) - mu;
     generatorData(sortIdx,PG) = ddSP;
@@ -70,6 +77,8 @@ for i = 1:nPG
     ps.runpsat('pf');
     ps.fm_abcd();
     [~, drs(i+nPG)] = SmallSignalStability.checkSmallSignalStability(zetaMin, ps.LA.a);
+
+     % ----- PRINT -----
      if PRINT
         % calculate angle (in rad)
         delta = pi/(nPG+1) * i;
@@ -82,7 +91,44 @@ for i = 1:nPG
         imIdx = length(im)+1;
         im{imIdx} = frame2im(frame);
     end
+    % ---- GREED -----
+    if isInGreedyTol(drs(i))
+        break
+    end
 end
+% % same but for - direction
+% if ~GREEDYQUIT
+%     for i = 1:nPG
+%         % set PGs
+%         ddSP = setPoints(1:nPG);
+%         ddSP(i) = ddSP(i) - mu;
+%         generatorData(sortIdx,PG) = ddSP;
+%         ps.PV.store = generatorData;
+%         ps.runpsat('pf');
+%         ps.fm_abcd();
+%         [~, drs(i+nPG)] = SmallSignalStability.checkSmallSignalStability(zetaMin, ps.LA.a);
+%         
+%          % ----- PRINT -----
+%          if PRINT
+%             % calculate angle (in rad)
+%             delta = pi/(nPG+1) * i;
+%             % x,y displacement components
+%             x = 0.004*sin(delta);
+%             y = 0.4*cos(delta);
+%             % drs(i) would be better ? 
+%             probePlots{i+nPG} = DirectedWalks.plot.plotDwUpdate(ax,plotIdx+y,curDR-x,pr,ddSP(i));
+%             frame = getframe(gcf);
+%             imIdx = length(im)+1;
+%             im{imIdx} = frame2im(frame);
+%         end
+%         % ---- GREED -----
+%         if isInGreedyTol(drs(i))
+%             break
+%         end
+%     end
+% end
+
+
 % we have a vector of all surrounding Zetas
 % calculate the value & idx of direction that minimizes the distance
 [~,idx] = min(abs(getDist(drs)));
