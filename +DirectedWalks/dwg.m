@@ -4,6 +4,10 @@
 % OBJECTIVE: Define stability boundary of N-dimensional space accurately.
 %
 % DESCRIPTION
+% Greedy step direction calculation - takes the first direction that
+% provides a smaller DR than the current one (smaller is defined in % using
+%   a tuning parameter).
+%
 % The algorithm starts from S points in the N dimensional space. The
 % algorithm runs parallel starting from each S.
 % Starting from S the algorithm starts to CHECK into each direction

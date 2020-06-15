@@ -1,26 +1,25 @@
-% DWF_S Development implementation of brute force directed walk algorithm.
-% DWF_S is a heavily modified version of the core algorithm that has
+% DWF_G Development implementation of brute force directed walk algorithm.
+% DWF_G is a heavily modified version of the core algorithm that has
 % multiple break hooks in case of a stuck descent.
 %
 % This script is used to develop/modify the core algorithm. It implements
 % debugging, step-by-step plotting and saving the plots as GIF.
 %
 % For detailed mathematical description of the algorithm
-% See also DIRECTEDWALKS.DWF
+% See also DIRECTEDWALKS.DWG
 
 %   starting point
-ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
-CASE_FILE = 'case_files/case9.m';
-PSAT_FILE = 'case_files/d_009_dyn.m';
+% ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
+% CASE_FILE = 'case_files/case9.m';
+% PSAT_FILE = 'case_files/d_009_dyn.m';
 
-% ACOPF_SEED = '.data/case14_2020_06_08T110325Z/case14_ACOPF.csv';%'.data/case9_ACOPF.csv';
-% CASE_FILE = 'case_files/case14.m';
-% PSAT_FILE = 'case_files\case14_matpower_limits.m';
+ACOPF_SEED = '.data/case14_2020_06_08T110325Z/case14_ACOPF.csv';%'.data/case9_ACOPF.csv';
+CASE_FILE = 'case_files/case14.m';
+PSAT_FILE = 'case_files\case14_matpower_limits.m';
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
-% setPoints = acopfResults{100,:};
-setPoint = acopfResults{68,:}; %-> pingpoing at dist = 0.0055 
+setPoint = acopfResults{100,:};
 
 % enable plotting
 PRINT = false;
@@ -44,21 +43,14 @@ t1 = tic;
 D_min = 0.0025;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
 % max number of iterations
 K_max = 1e2;
-SmallestStepSizeScale = 0.0005;
-E(1) = 0.2;
-E(2) = 0.1;
-E(3) = 0.05;
-E(4) = 0.025;
-
-D(1) = 0.07;
-D(2) = 0.032;
-D(3) = 0.0095;
+SmallestStepSizeScale = 0.05;
+HICStepSizeScale = 0.005;
 
 % ------ PSAT/MATPOWER initialization ------
 % MATPOWER INIT
 MPC = loadcase(CASE_FILE);
 % PMAX vector of generators
-PMAX = 9; %PMIN = 10;
+PMAX = 9;
 gIdx = util.getGenList(MPC);
 gMaxVec = MPC.gen(gIdx,PMAX)./MPC.baseMVA; % TODO: remove slack
 % PSAT INIT
@@ -75,7 +67,6 @@ ps.fm_abcd();
 
 % minimum step size ( also in get step size func)
 step_min = gMaxVec.*SmallestStepSizeScale;
-nDim = size(setPoint,2);
 
 % ------ DW initialization ------
 % DW iterator
@@ -84,7 +75,7 @@ i = 1;
 nBuff = 5;
 buff = rand(1,nBuff);
 % array of set points
-NEW_DS_POINTS = [];%cell{K_max, nDim};
+NEW_DS_POINTS = [];
 % get current zeta
 [~, curDR] = SmallSignalStability.checkSmallSignalStability(.03, ps.LA.a);
 % number of generators except slack
@@ -139,9 +130,11 @@ if PRINT
 end
 while i <= K_max
     while dist > D_min && i <= K_max
-        alpha_k = getStepSize(dist, gMaxVec);%,'epsLims',E,'dLims',D);
+%         alpha_k = getStepSize(dist, gMaxVec);%,'epsLims',E,'dLims',D);
+        alpha_k = step_min;
+        
         % get the gradient
-        [gradDir, im] = getStepDir(ps, nSP, DR,'print',PRINT,'imwrite',im);
+        [gradDir, im] = getGreedy(ps, nSP, DR,'print',PRINT,'imwrite',im);
         % calculate new set point
         nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values
@@ -192,8 +185,8 @@ while i <= K_max
     % take the next step with the minimum step size -> no step size calc
     % take the next step to the direction where the DR stays the same/close
     %     gradDir = getHICStepDir(ps, nSP, DR);
-    [gradDir,im] = getStepDir(ps, nSP, DR, 'print',PRINT,'imwrite',im);
-    alpha_k = step_min;
+    [gradDir,im] = getGreedy(ps, nSP, DR, 'print',PRINT,'imwrite',im);
+    alpha_k = gMaxVec.*HICStepSizeScale;
     % calculate the new set point
     nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
     % take the step: set psat object to new set point values

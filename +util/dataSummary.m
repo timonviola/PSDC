@@ -14,7 +14,9 @@ readTVars = false;
 if nargin > 3
     readTVars = varargin{1};
 end
-
+fprintf('Set points file:\t%s\n',setPointsCsv)
+fprintf('PSAT file:\t\t\t%s\n',psatFile)
+fprintf('MATPOWER file:\t\t%s\n',mpFile)
 if ~readTVars && (contains(setPointsCsv,'ACOPF') || contains(setPointsCsv,'QCRM'))
     warning('PSDC:utils','Input table columns will not be sorted.')
 end
@@ -84,10 +86,21 @@ parfor i = 1:N
 end
 delete(pw)
 toc(t2)
-
-fname = strsplit(setPointsCsv,'.');
-save([fname{1}  '_summary.mat'],'stable','classDetails','dampingRatio')
-fprintf('Results are saved as %s\n\n',[fname{1}  '_summary.mat']);
+% save to the right folder with the right name
+if contains(setPointsCsv,'/')
+    fName = strsplit(setPointsCsv,'/');
+    fPath = strjoin(fName(1:end-1),'/');
+elseif contains(setPointCsv,'\')
+    fName = strsplit(setPointsCsv,'/');
+    fPath = strjoin(fName(1:end-1),'/');
+else
+    fName = setPointsCsv;
+    fPath = '';
+end
+fName = strsplit(fName{end},'.');
+fSaveName = [fPath filesep fName{1} '_summary.mat'];
+fprintf('Summay is saved as: %s\n',fSaveName)
+save(fSaveName,'stable','classDetails','dampingRatio')
 
 %% print
 util.printDataSummary(stable, classDetails)

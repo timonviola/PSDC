@@ -1,9 +1,9 @@
 % parallel directed walks
 t2 = tic;
-OUT_DIR = '.data/case9_2020_06_08T144804Z/';
-ACOPF_SEED = [OUT_DIR 'case9_ACOPF.csv'];
-PSAT_FILE = ['case_files' filesep 'd_009_dyn.m'];
-CASE_NAME = 'case9';
+OUT_DIR = '.data/case14_2020_06_09T220252Z/';
+ACOPF_SEED = [OUT_DIR 'case14_ACOPF.csv'];
+PSAT_FILE = ['case_files' filesep 'case14_matpower_limits.m'];
+CASE_NAME = 'case14';
 CASE_FILE = [pwd filesep 'case_files' filesep CASE_NAME '.m'];
 
 util.add_dependencies
@@ -36,7 +36,7 @@ if ispc
 else
     % load the default cluster profile
     clust=parcluster('clusterProfileElektro2019');
-    numw = 8;
+    numw = 64;
     p = parpool(clust, numw);
 end
 disp(p)
@@ -49,6 +49,7 @@ end
 p.addAttachedFiles(PSAT_FILE);
 p.addAttachedFiles(CASE_FILE);
 
+%% TODO: check for duplicates
 
 %% Add first set to data-set
 % Progressbar that shows on STDOUT
