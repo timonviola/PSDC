@@ -1,7 +1,7 @@
 % fit a normal distribution to feasible points
-load('.data\case9_2020_06_08T144804Z\unified_case9_summary.mat')
-setpoints = readmatrix(".data\case9_2020_06_08T144804Z\unified_case9.csv","Delimiter",",");
-NSAMPLES = 1e5;
+load('.data/case14_dwg/unified_case14_summary.mat')
+setpoints = readmatrix(".data/case14_dwg/unified_case14.csv","Delimiter",",");
+NSAMPLES = 2e5;
 %  
 %
 idxStablePoints = (stable == 1);
@@ -17,20 +17,20 @@ for i = 1:dim(2)
     sigma(i) = psdc.sigma;
 end
 
-%% fig bivariate normal distribution
-x1 = -3:0.2:3;
-x2 = -3:0.2:3;
-[X1,X2] = meshgrid(x1,x2);
-X = [X1(:) X2(:)];
-
-y = mvnpdf(X,mu(1:2),sigma(1:2));
-y = reshape(y,length(x2),length(x1));
-surf(x1,x2,y)
-caxis([min(y(:))-0.5*range(y(:)),max(y(:))])
-axis([-3 3 -3 3 0 0.4])
-xlabel('PG1')
-ylabel('PG2')
-zlabel('Probability Density')
+%	% fig bivariate normal distribution
+%	x1 = -3:0.2:3;
+%	x2 = -3:0.2:3;
+%	[X1,X2] = meshgrid(x1,x2);
+%	X = [X1(:) X2(:)];
+%
+%	y = mvnpdf(X,mu(1:2),sigma(1:2));
+%	y = reshape(y,length(x2),length(x1));
+%	surf(x1,x2,y)
+%	caxis([min(y(:))-0.5*range(y(:)),max(y(:))])
+%	axis([-3 3 -3 3 0 0.4])
+%	xlabel('PG1')
+%	ylabel('PG2')
+%	zlabel('Probability Density')
 %% fit multivariate normal distribution
 % no - > this is not what I need
 % y = mvnpdf(X,mu,sigma);
@@ -53,9 +53,9 @@ R = mvnrnd(mu,sigma,NSAMPLES);
 
 fprintf('Sampled %d points \n',NSAMPLES)
 %% check results
-CASE_FILE = 'case_files/case9.m';
-PSAT_FILE = 'case_files/d_009_dyn.m';
-fname = 'tmp_1e5_rnd_samples.csv';
+CASE_FILE = 'case_files/case14.m';
+PSAT_FILE = 'case_files/case14_matpower_limits.m';
+fname = '.data/case14_dwg/mvnd_2e5_samples.csv';
 writematrix(R,fname);
-
+util.add_dependencies
 util.dataSummary(fname,PSAT_FILE,CASE_FILE)

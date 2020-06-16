@@ -1,6 +1,6 @@
 #!/bin/sh
 #BSUB -q elektro
-#BSUB -J dw_force
+#BSUB -J dw_greedy
 #BSUB -W 12:00
 #BSUB -n 1 
 #BSUB -R "rusage[mem=2GB]"

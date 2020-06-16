@@ -1,6 +1,6 @@
 #!/bin/sh
 #BSUB -q elektro
-#BSUB -J mvnd
+#BSUB -J mvndG
 #BSUB -W 12:00
 #BSUB -n 1 
 #BSUB -R "rusage[mem=2GB]"
