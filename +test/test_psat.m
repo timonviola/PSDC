@@ -8,6 +8,7 @@
 % * plot
 
 clear
+
 if ~ispc
     util.add_dependencies
 end
@@ -24,10 +25,11 @@ fprintf('SUCCESSFUL\n')
 %% Load case, power-flow
 caseFolder = [pwd filesep 'case_files' filesep];
 % caseName = 'd_009_dyn';
-caseName = 'd_IEEE68bus';
+caseName = 'd_iceland'; %'d_IEEE68bus';
 fprintf(pad(['Load case ' caseName],50,'right','.'))
 % ps.runpsat(caseName,caseFolder,'/case_files/','data');
-ps.runpsat(['case_files' filesep caseName '.m'],'data');
+% ps.runpsat(['case_files' filesep caseName '.m'],'data');
+ps.runpsat('psat_tmpcase118.m','data')
 fprintf('SUCCESSFUL\n')
 
 fprintf(pad('Run power-flow',50,'right','.'))
