@@ -11,18 +11,23 @@
 %   starting point
 % ACOPF_SEED = '.data/case9_2020_06_03T162628Z/case9_ACOPF.csv';%'.data/case9_ACOPF.csv';
 % CASE_FILE = 'case_files/case9.m';
-% PSAT_FILE = 'case_files/d_009_dyn.m';
+% PSAT_FILE = 'case_files/d_case9.m';
 
-ACOPF_SEED = '.data/case14_2020_06_08T110325Z/case14_ACOPF.csv';%'.data/case9_ACOPF.csv';
-CASE_FILE = 'case_files/case14.m';
-PSAT_FILE = 'case_files\case14_matpower_limits.m';
+% ACOPF_SEED = '.data/case14_2020_06_08T110325Z/case14_ACOPF.csv';%'.data/case9_ACOPF.csv';
+% CASE_FILE = 'case_files/case14.m';
+% PSAT_FILE = 'case_files\d_case14m';
+
+ACOPF_SEED = '.data\case39_2020_06_16T103242Z\case39_ACOPF.csv';%'.data/case9_ACOPF.csv';
+CASE_FILE = 'case_files/case39.m';
+PSAT_FILE = 'case_files\d_case39.m';
+
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
-setPoint = acopfResults{100,:};
+setPoint = acopfResults{2,:};
 
 % enable plotting
-PRINT = false;
+PRINT = true;
 % wrtie gif from plot
 GIF = false;
 % enable pf printing
