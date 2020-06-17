@@ -27,7 +27,7 @@ res = readtable(setPointsCsv, 'ReadVariableNames',readTVars);
 
 % if setPointsCsv is QCRM/ACOPF the columns have to be sorted
 if readTVars
-    res = res(:,sort(res.Properties.VariableNames));
+    res = res(:,util.natsort(res.Properties.VariableNames));
 end
 
 % Check for repeated data
