@@ -9,14 +9,14 @@ t = tic;
 % 'case39';
 % 'case14';
 % 'case9';
-CASE_NAME = 'case14';
+CASE_NAME = 'case39';
 CASE_FILE = [pwd filesep 'case_files' filesep CASE_NAME '.m'];
 % PSAT file name        (dynamic data)
 % other possible case files:
 %   'd_IEEE39bus.m'];
 %   'd_014_dyn_mdl_pretty.m'];
 %   'd_009_dyn.m'];
-PSAT_FILE = ['case_files' filesep 'case14_matpower_limits.m'];
+PSAT_FILE = ['case_files' filesep 'd_case39.m'];
 % get current timestamp
 TS = timestamp;
 OUT_DIR = ['.data' filesep CASE_NAME '_' TS];
@@ -65,7 +65,7 @@ N_SAMPLES=1000;
 FILE_NAME_SAMPLES = [CASE_NAME '_QCRM_' num2str(N_ITERATIONS) '.csv'];
 OUT_FILE_NAME_SAMPLES=[hF FILE_NAME_SAMPLES];
 % System call to start julia
-stat = system(['julia qc_relaxation.jl --bit 5 --bto 300 "'  btFile '" "'...
+stat = system(['julia qc_relaxation.jl --bit 10 --bto 600 "'  btFile '" "'...
     num2str(N_ITERATIONS) '" "' OUT_FILE_NAME_SAMPLES '"  "'...
     num2str(N_SAMPLES) '"']);
 if stat
