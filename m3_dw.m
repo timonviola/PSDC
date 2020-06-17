@@ -1,17 +1,16 @@
 % parallel directed walks
 t2 = tic;
-OUT_DIR =  '.data/case14_2020_06_09T220252Z/';
-ACOPF_SEED = [OUT_DIR 'case14_ACOPF.csv'];
-SAVE_DIR = '.data/case14_dwg/'; 
-PSAT_FILE = ['case_files' filesep 'case14_matpower_limits.m'];
-CASE_NAME = 'case14';
-CASE_FILE = [pwd filesep 'case_files' filesep CASE_NAME '.m'];
-
-util.add_dependencies
-
+OUT_DIR =  '.data/case39_2020_06_16T103242Z/';
+ACOPF_SEED = [OUT_DIR 'case39_ACOPF.csv'];
+PSAT_FILE = ['case_files' filesep 'case39.m'];
+CASE_NAME = 'case39';
+CASE_FILE = [pwd filesep 'case_files' filesep 'd_case39.m'];
+if ~ispc
+    util.add_dependencies
+end
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 % Sort columns
-acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
+acopfResults = acopfResults(:,util.natsort(acopfResults.Properties.VariableNames));
 
 % Check for repeated data in acopfResults:
 [C, ia, ic]= unique(acopfResults,'stable');
@@ -58,7 +57,7 @@ pw = textBar(N,'Parallel Directed walks');
 parfor i = 1:N
     writematrix( ...
         DirectedWalks.dwg_f(acopfResults{i,:},PSAT_FILE,CASE_FILE),...
-        [SAVE_DIR 'dw_set_points' CASE_NAME '_' num2str(i) '.csv']);
+        [OUT_DIR 'dw_set_points' CASE_NAME '_' num2str(i) '.csv']);
    increment(pw)
 end
 
