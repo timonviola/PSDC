@@ -32,9 +32,22 @@ mpcOpt.opf.use_vg = 1;
 mpc.gen(:, VG) = setPoint(NG+1:end)'; % TODO: check if VG is really the same
 % run opf
 [results,~] = runopf(mpc,mpcOpt);
+if ~results.success
+    warning('PSDC:UTIL','Could not enforce voltage set-points.')
+    mpcOpt.opf.use_vg = 0;
+    [results,~] = runopf(mpc,mpcOpt);
+    if ~results.success
+        warning('PSDC:UTIL','Could not find OPF solution.')
+    end
+end
+
 % debug
 %results.gen(:,[1,PG,VG])
 % OOPSAT works with p.u. -> divide w/ baseMVA PG
-optimalSetpoint = [results.gen(2:end,PG)'./mpc.baseMVA results.gen(:,VG)'];
+optimalSetpoint = [results.gen(util.getGenList(mpc),PG)'./mpc.baseMVA results.gen(:,VG)'];
+
+% This function returns the correct values if and only if the generators
+% are ordered in ascending bus number in the MPC file.
+
 
 % TODO: check if PSAT also thinks its acopf cool

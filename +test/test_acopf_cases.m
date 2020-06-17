@@ -39,12 +39,12 @@ test.checklimits(resPf, 1, 0)
 % MATPOWER - no violations
 
 % set only generator power:
-[GEN_BUS, PG, QG, QMAX, QMIN, VG, MBASE, GEN_STATUS, PMAX, PMIN, MU_PMAX,...
-    MU_PMIN, MU_QMAX, MU_QMIN, PC1, PC2, QC1MIN, QC1MAX, QC2MIN, QC2MAX,...
-    RAMP_AGC, RAMP_10, RAMP_30, RAMP_Q, APF] = idx_gen;
-
-nSP = [res.gen(2:end,PG)'./res.baseMVA res.gen(:,VG)'];
-ps.PSet(nSP);
+% [GEN_BUS, PG, QG, QMAX, QMIN, VG, MBASE, GEN_STATUS, PMAX, PMIN, MU_PMAX,...
+%     MU_PMIN, MU_QMAX, MU_QMIN, PC1, PC2, QC1MIN, QC1MAX, QC2MIN, QC2MAX,...
+%     RAMP_AGC, RAMP_10, RAMP_30, RAMP_Q, APF] = idx_gen;
+PG = 2; VG = 6;
+nSP = [resPf.gen(util.getGenList(MPC),PG)'./resPf.baseMVA resPf.gen(:,VG)'];
+ps.PVSet(nSP);
 ps.runpsat('pf')
 res_psat = ps.powerFlowResults('print');
 [opfStab,opfDet] = DirectedWalks.checkOPFLimits(MPC, res_psat, 'print')%#ok
