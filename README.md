@@ -39,6 +39,11 @@ Julia                                                 v1.0.*
   "PowerModels" => v"0.15.4"
   "ArgParse"    => v"1.1.0"
 ```
+```
+R version 4.0.0 (2020-04-24)
+  volesti_1.1.0 Rcpp_1.0.4.6        https://github.com/cran/volesti/tree/1.1.0
+  compiler_4.0.0   tools_4.0.0      codetools_0.2-16
+```
 
 # Installation
 Some tips and notes on installing non-trivial dependencies are given below.
