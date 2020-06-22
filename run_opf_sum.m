@@ -6,4 +6,4 @@ PSAT_FILE = 'case_files/d_case68.m';
 fprintf('OUT_DIR: %s\n',OUT_DIR);
 
 util.add_dependencies
-util.dataSummary(ACOPF_SEED, PSAT_FILE, CASE_FILE, true)
+util.dataSummary(ACOPF_SEED, PSAT_FILE, CASE_FILE, 'readTableVariables', true)

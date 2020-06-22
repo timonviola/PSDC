@@ -23,7 +23,7 @@ im = p.Results.imwrite;
 mu = 0.0005;
 % if dist is <= than this, we take it
 curDist = getDist(curDR);
-GREEDTOL = 0.99995;
+GREEDTOL = 0.999995;
 % GREEDTOL = 1;
 isInGreedyTol = @(x) getDist(x) <= curDist*GREEDTOL;
 % GREEDYQUIT = false;

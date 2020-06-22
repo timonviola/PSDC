@@ -10,10 +10,20 @@
 
 function dataSummary(setPointsCsv,psatFile,mpFile,varargin)
 t = tic;
-readTVars = false;
-if nargin > 3
-    readTVars = varargin{1};
-end
+% readTVars = false;
+% if nargin > 3
+%     readTVars = varargin{1};
+% end
+readTVarsDefault = false;
+zetaMinDefault = 0.03;
+p = inputParser;
+addOptional(p,'zetaMin',zetaMinDefault,@(x) isnumeric(x));
+addParameter(p,'readTableVariables',readTVarsDefault,@(x) islogical(x));
+parse(p,setPointsCsv,psatFile,mpFile,varargin{:})
+
+zetaMin = p.Results.zetaMin;
+readTVars = p.Results.readTableVariables;
+
 fprintf('Set points file:\t%s\n',setPointsCsv)
 fprintf('PSAT file:\t\t\t%s\n',psatFile)
 fprintf('MATPOWER file:\t\t%s\n',mpFile)
@@ -81,7 +91,7 @@ pw = textBar(N,'Parallel checks');
 t2 = tic;
 parfor i = 1:N
     [stable(i), classDetails{i}, dampingRatio(i)] = ... 
-        DirectedWalks.checkSetpoint(res{i,:},psatFile,mpFile);
+        DirectedWalks.checkSetpoint(res{i,:},psatFile,mpFile,zetaMin);
     increment(pw)
 end
 delete(pw)
