@@ -1,12 +1,32 @@
 function NEW_DS_POINTS = dwf_f(setPoint, PSAT_FILE, CASE_FILE,varargin)
 % DWF_F Directed walk function.
 % See also DIRECTEDWALKS.DWF
-PRINT = false;
-if nargin > 3
-    if strcmp(varargin{1},'print')
-        PRINT = true;
-    end
-end
+% PRINT = false;
+% if nargin > 3
+%     if strcmp(varargin{1},'print')
+%         PRINT = true;
+%     end
+% end
+
+zetaMinDefault = 0.03;
+printDefault = false;
+
+p = inputParser;
+addRequired(p,'setPoint',@(x) isnumeric(x))
+addRequired(p,'PSAT_FILE')
+addRequired(p,'CASE_FILE')
+addOptional(p,'zetaMin',zetaMinDefault , @(x)isnumeric(x))
+addParameter(p,'print',printDefault, @(x)islogical(x))
+
+parse(p,setPoint, PSAT_FILE, CASE_FILE, varargin{:})
+setPoint = p.Results.setPoint;
+PSAT_FILE = p.Results.PSAT_FILE;
+CASE_FILE = p.Results.CASE_FILE;
+ZETAMIN = p.Results.zetaMin;
+PRINT = p.Results.print;
+
+
+
 import DirectedWalks.*
 
 % ------ DW hyper parameters ------
@@ -57,11 +77,11 @@ buff = zeros(1,nBuff);
 NEW_DS_POINTS = [];%cell{K_max, nDim};
 
 % get current zeta
-[~, curDR] = SmallSignalStability.checkSmallSignalStability(.03, ps.LA.a);
+[~, curDR] = SmallSignalStability.checkSmallSignalStability(ZETAMIN, ps.LA.a);
 % number of generators except slack
 nPG = size(ps.PV.store,1);
 DR = curDR;
-dist = getDist(DR);
+dist = getDist(DR, ZETAMIN);
 buff(nBuff) = DR;
 nSP = setPoint;
 ps.PVSet(nSP);
@@ -97,7 +117,7 @@ end
 
 EXIT = false;
 if PRINT
-    [fig, ax, prop] = plot.plotDWInit('legend',true); % ax
+    [fig, ax, prop] = plot.plotDWInit('zetaMin',ZETAMIN,'legend',true); % ax
     [etH, et] = plot.addTimeElapsedBox(fig);
     drLine = cell(K_max,1);
     drLine{i} = plot.plotDwUpdate(ax,0,DR,prop,nSP);
@@ -107,27 +127,27 @@ while i <= K_max
     while dist > D_min && i <= K_max
         alpha_k = getStepSize(dist, gMaxVec);%,'epsLims',E,'dLims',D);
         % get the gradient
-        gradDir = getStepDir(ps, nSP, DR,'print',PRINT);
+        gradDir = getStepDir(ps,nSP,DR,'zetaMin',ZETAMIN,'print',PRINT);
         % calculate new set point
-        nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
+        nSP = nSP + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values
         ps.PSet(nSP);
         ps.runpsat('pf');
         ps.fm_abcd();
         % get new DR
-        [~, DR] = SmallSignalStability.checkSmallSignalStability(.03, ps.LA.a);
+        [~, DR] = SmallSignalStability.checkSmallSignalStability(ZETAMIN, ps.LA.a);
         buff = circshift(buff,-1);
         buff(nBuff) = DR;
-        dist = getDist(DR);
-        %         fprintf('nSP ')
-        %         disp(nSP)
-        %         fprintf('DR ')
-        %         disp(DR)
-        %         fprintf('dist ')
-        %         disp(dist)
+        dist = getDist(DR,'zetaMin',ZETAMIN);
         if PRINT
             etH.String = ['Elapsed time: ' util.getTimeElapsed(et)];
             drLine{i} = plot.plotDwUpdate(ax,i,DR,prop,nSP);
+            fprintf('nSP ')
+            disp(nSP)
+            fprintf('DR ')
+            disp(DR)
+            fprintf('dist ')
+            disp(dist)
         end
         i = i+1;
         if ~(any(diff(buff)))
@@ -154,7 +174,7 @@ while i <= K_max
     % take the next step with the minimum step size -> no step size calc
     % take the next step to the direction where the DR stays the same/close
     %     gradDir = getHICStepDir(ps, nSP, DR);
-    gradDir = getStepDir(ps, nSP, DR, 'print',PRINT);
+    gradDir = getStepDir(ps, nSP, DR,'zetaMin',ZETAMIN,'print',PRINT);
     alpha_k = step_min;
     % calculate the new set point
     nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
@@ -163,8 +183,8 @@ while i <= K_max
     ps.runpsat('pf');
     ps.fm_abcd();
     % get new DR
-    [~, DR] = SmallSignalStability.checkSmallSignalStability(.03,ps.LA.a);
-    dist = getDist(DR);
+    [~, DR] = SmallSignalStability.checkSmallSignalStability(ZETAMIN, ps.LA.a);
+    dist = getDist(DR,ZETAMIN);
     if PRINT
         etH.String = ['Elapsed time: ' util.getTimeElapsed(et)];
         drLine{i} = plot.plotDwUpdate(ax,i,DR,feasProp,nSP);

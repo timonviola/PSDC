@@ -21,7 +21,15 @@ MPC.gen(:,[PMAX,PMIN]);
 % do not change the slack bus
 genIdx = util.getGenList(MPC);
 genRanges = MPC.gen(genIdx,[PMAX,PMIN])./MPC.baseMVA;
+
+% voltages:
+VMAX = 12;
+VMIN = 13;
+allGIdx = MPC.gen(:,1);
+vRanges = [MPC.bus(allGIdx,VMAX),MPC.bus(allGIdx,VMIN)];
+
 % "Explicit is better than implicit" - PEP20
 % alpha is 1 percent of each generator's range.
-alpha = (genRanges(:,1) - genRanges(:,2))./100 .* alphaScale;
+alpha = [(genRanges(:,1) - genRanges(:,2))./100 .* alphaScale;
+    (vRanges(:,1) - vRanges(:,2))./100 .* alphaScale];
 end

@@ -14,7 +14,7 @@ function create_pol(N::Integer)
 """Create N-dim unit cube."""
     rSTDO = R"""
     library(volesti)
-    P <- GenCube($N,'H')
+    P <- gen_cube($N,'H')
     P$b <- cbind(matrix(0,1,$N), matrix(1,1,$N))
     """ # mondify cube from [-1 1] to [0 1]
     return rcopy(R"P$A"),rcopy(R"P$b")
@@ -24,7 +24,7 @@ function create_scaled_pol(N::Integer,U::AbstractArray)
 """Create polytope with increased upper bounds."""
     rSTDO = R"""
     library(volesti)
-    P <- GenCube($N,'H')
+    P <- gen_cube($N,'H')
     P$b <- cbind(matrix(0,1,$N), matrix(c(unlist($U)),1,$N))
     """ # mondify cube from [-1 1] to [0 1]
     return rcopy(R"P$A"),rcopy(R"P$b")
@@ -44,7 +44,7 @@ function get_pol()
 end
 
 function sample_pol(number_of_samples::Integer=1)
-    samples = rcopy(R"sample_points(P,N=$number_of_samples)")
+    samples = rcopy(R"sample_points(P, $number_of_samples)")
     return samples::Array{Float64,2}
 end
 
@@ -156,6 +156,8 @@ function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer, vol
         push!(optimal_setpoints, (x_opt[:] .* nFactor)' )
         if !(isapprox(JuMP.value(r), 0; atol=TOLERANCE))
             # Update results
+            debug(logger,string("new A row: ", n_normT))
+            debug(logger,string("new b val: ", n_normT*x_opt))
             add_to_pol(n_normT, n_normT*x_opt)
             debug(logger,string("Polytope values |get_pol() \n", get_pol() ))
         end

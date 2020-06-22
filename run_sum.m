@@ -13,5 +13,6 @@ for i = 1:N
 end
 writematrix(res{:,:}, [OUT_DIR 'unified_case14.csv'])
 util.add_dependencies
-util.dataSummary([ OUT_DIR 'unified_case14.csv'], PSAT_FILE, CASE_FILE)
-%util.dataSummary(ACOPF_SEED, PSAT_FILE, CASE_FILE, true)
+
+util.dataSummary([ OUT_DIR 'unified_case14.csv'], PSAT_FILE, CASE_FILE, 0.03)
+%util.dataSummary(ACOPF_SEED, PSAT_FILE, CASE_FILE,'readTableVariables' true)

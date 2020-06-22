@@ -24,11 +24,20 @@ function varargout = checkSetpoint(setPoints,...
      psatFName,matpowerFName,varargin)
 % PSAT is initialized inside the function to support parallel excecution.
 
-options = {};
-if nargin > 3
-    options = varargin;
-end
+printOptions = {'print',''};
+printDefault = {};
+zetaMinDefault = 0.03;
 
+p = inputParser;
+addOptional(p,'zetaMin',zetaMinDefault , @(x)isnumeric(x))
+addParameter(p,'print',printDefault, @(x) ismember(x,printOptions) || iscell(x))
+parse(p,varargin{:})
+
+zetaMin = p.Results.zetaMin;
+PRINT = p.Results.print;
+if ~iscell(PRINT)
+    PRINT = {PRINT};
+end
 % ----- Initialize data -----
 % matpower
 loadedCase = loadcase(matpowerFName);
@@ -42,7 +51,7 @@ ps.Settings.pv2pq = 0;
 ps.runpsat(psatFName,'data')
 ps.runpsat('pf') 
 
-%TODO: check setPoints size = 2xNG - 1
+%TODO: use ps.PVSet
 
 % ----- Set P_g, V_g -----
 PG = 4; VG = 5;
@@ -64,14 +73,14 @@ ps.PV.store = generatorData;
 % run modified pf
 ps.runpsat('pf');
 % power flow results, 'print' option available
-res = ps.powerFlowResults(options{:});
+res = ps.powerFlowResults(PRINT{:});
 
 % ----- Optimal Power Flow criteria -----
-[opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,options{:});
+[opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
 
 % TODO if failed set ps.Settings.pv2pq = 1; and retry.
 if ~opfStab
-    if any(strcmp(options,'print'))
+    if any(strcmp(PRINT,'print'))
         warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
         'Retry with enforced Q-limits.\nPG QG VM Sf\n' num2str(opfDet)])
     end    
@@ -80,8 +89,8 @@ if ~opfStab
     ps.SW.store = slackData;
     ps.PV.store = generatorData;
     ps.runpsat('pf');
-    res = ps.powerFlowResults(options{:});
-    [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,options{:});
+    res = ps.powerFlowResults(PRINT{:});
+    [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
 end
 % if ~opfStab
 %     sssStab = nan;
@@ -91,10 +100,10 @@ end
 %         '\nPG QG VM Sf\n' num2str(opfDet)])
 %     end  
 % else
-    % ----- Small Signal Stability -----
-    ps.fm_abcd();
-    [sssStab, minDR] =...
-        SmallSignalStability.checkSmallSignalStability(.03,ps.LA.a);
+% ----- Small Signal Stability -----
+ps.fm_abcd();
+[sssStab, minDR] =...
+    SmallSignalStability.checkSmallSignalStability(zetaMin,ps.LA.a);
 % end
 % ----- output -----
 if nargout >= 1

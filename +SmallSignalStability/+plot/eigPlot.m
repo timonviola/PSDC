@@ -62,6 +62,10 @@ elseif(class(lambda) == "cell")
     sh{:};
 end
 
+% add DR data tip row
+row = dataTipTextRow('DR',-1*real(lambda)./abs(lambda),'%+4.4g');
+sh.DataTipTemplate.DataTipRows(end+1) = row;
+
 if nargout
     varargout{1} = sh;
     varargout{2} = axh;

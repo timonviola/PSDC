@@ -48,7 +48,7 @@ t1 = tic;
 D_min = 0.0025;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
 % max number of iterations
 K_max = 1e2;
-SmallestStepSizeScale = 0.05;
+SmallestStepSizeScale = 0.5;
 HICStepSizeScale = 0.005;
 
 % ------ PSAT/MATPOWER initialization ------
@@ -105,7 +105,9 @@ res = ps.powerFlowResults(POT{:});
 if ~opfStab
     warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
         'Retry with enforced Q-limits.\nPG QG VM Sf\n' num2str(opfDet)])
+    warning('off','MATLAB:subscripting:noSubscriptsSpecified');
     nSP = util.nearestOptim(MPC,nSP);
+    warning('on','MATLAB:subscripting:noSubscriptsSpecified');
     ps.PVSet(nSP);
     % enforce q limits
     ps.Settings.pv2pq = 1;
@@ -121,7 +123,7 @@ if ~opfStab
     end
 end
 
-
+%%
 EXIT = false;
 im = {};
 if PRINT
@@ -153,16 +155,17 @@ while i <= K_max
         dist = getDist(DR);
 %         fprintf('nSP ')
 %         disp(nSP)
-%         fprintf('DR ')
-%         disp(DR)
-%         fprintf('dist ')
-%         disp(dist)
+        
         if PRINT
             etH.String = ['Elapsed time: ' util.getTimeElapsed(et)];
             drLine{i} = plot.plotDwUpdate(ax,i,DR,prop,nSP);
             frame = getframe(gcf);
             imIdx = length(im)+1;
             im{imIdx} = frame2im(frame);
+            fprintf('DR  ')
+            disp(DR)
+            fprintf('dist')
+            disp(dist)
         end
         i = i+1;
         % IF WE end up pingpong ing between 2 points quit !
@@ -171,7 +174,7 @@ while i <= K_max
             EXIT = true;
             break
         end
-        if numel(uniquetol(buff,1e-3)) <= 2
+        if numel(uniquetol(buff,1e-5)) <= 2
             warning('PSDC:DW','Stuck between 2 values, exiting')
             EXIT = true;
             break

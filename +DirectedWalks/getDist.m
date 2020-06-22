@@ -10,8 +10,7 @@ function dist = getDist(currentZeta,varargin)
 zetaMinDefault = 0.03;
 p = inputParser;
 addRequired(p,'currentZeta',@(x) isnumeric(x))
-addOptional(p,'zetaMin',zetaMinDefault , @(x)validateattributes(x,...
-    {'numeric'}))
+addOptional(p,'zetaMin',zetaMinDefault , @(x) isnumeric(x))
 parse(p,currentZeta,varargin{:});
 currentZeta = p.Results.currentZeta;
 zetaMin = p.Results.zetaMin;
