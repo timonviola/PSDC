@@ -156,6 +156,8 @@ function run_qc_relax(pm::AbstractPowerModel, number_of_iterations::Integer, vol
         push!(optimal_setpoints, (x_opt[:] .* nFactor)' )
         if !(isapprox(JuMP.value(r), 0; atol=TOLERANCE))
             # Update results
+            debug(logger,string("new A row: ", n_normT))
+            debug(logger,string("new b val: ", n_normT*x_opt))
             add_to_pol(n_normT, n_normT*x_opt)
             debug(logger,string("Polytope values |get_pol() \n", get_pol() ))
         end
