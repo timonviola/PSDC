@@ -2,9 +2,9 @@
 t2 = tic;
 OUT_DIR =  '.data/case39_2020_06_16T103242Z/';
 ACOPF_SEED = [OUT_DIR 'case39_ACOPF.csv'];
-PSAT_FILE = ['case_files' filesep 'case39.m'];
+PSAT_FILE = ['case_files' filesep 'd_case39.m'];
 CASE_NAME = 'case39';
-CASE_FILE = [pwd filesep 'case_files' filesep 'd_case39.m'];
+CASE_FILE = [pwd filesep 'case_files' filesep 'case39.m'];
 if ~ispc
     util.add_dependencies
 end
@@ -56,7 +56,7 @@ p.addAttachedFiles(CASE_FILE);
 pw = textBar(N,'Parallel Directed walks');
 parfor i = 1:N
     writematrix( ...
-        DirectedWalks.dwg_f(acopfResults{i,:},PSAT_FILE,CASE_FILE),...
+        DirectedWalks.dwf_f(acopfResults{i,:},PSAT_FILE,CASE_FILE,0.0125),...
         [OUT_DIR 'dw_set_points' CASE_NAME '_' num2str(i) '.csv']);
    increment(pw)
 end
