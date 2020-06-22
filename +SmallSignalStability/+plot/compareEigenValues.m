@@ -14,7 +14,7 @@ defaultAxesStyle = {'LineStyle',':','Color','0.65,0.65,0.65'};
 l.x = yline(0,defaultAxesStyle{:});
 l.y = xline(0,defaultAxesStyle{:});
 
-N = size(A_matrices,1);
+N = max(size(A_matrices));
 
 sh = cell(N,1);
 %cmp = colormap('winter');
@@ -54,7 +54,8 @@ function showData(varargin)
       %fprintf('in: %3.3f\trounded: %d \n',varargin{1}.Value,newVal)
       varargin{1}.Value = newVal;       % bound it
       [~,zeta,~] = SmallSignalStability.damp_(A_matrices{newVal});
-      dText.String = "Damping ratio: " + max(zeta);
+      chr = fprintf('Current Damping ratio: %06.4f\n',min(zeta));
+      dText.String = "Damping ratio: " + min(zeta);
       if strcmp(varargin{1}.Tag,'Ps')
           %sh{curVal}.Visible = 'off';
           if(oldVal ~= 0)
@@ -71,7 +72,7 @@ function showData(varargin)
       end
       oldVal = curVal;
       curVal = newVal;
-      %drawnow                          % refresh figure
+      drawnow                          % refresh figure
 end
 
 if 0 < nargout
