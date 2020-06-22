@@ -35,24 +35,33 @@ D_min = 0.0025;
 % max number of iterations
 K_max = 1e2;
 SmallestStepSizeScale = 0.0005;
-E(1) = 0.2;
-E(2) = 0.1;
-E(3) = 0.05;
-E(4) = 0.025;
+% settings: case 14
+% E(1) = 0.2;
+% E(2) = 0.1;
+% E(3) = 0.05;
+% E(4) = 0.025;
+% 
+% D(1) = 0.07;
+% D(2) = 0.032;
+% D(3) = 0.0095;
+
+% case 39
+E(1) = 0.3;
+E(2) = 0.2;
+E(3) = 0.2;
+E(4) = 0.05;
 
 D(1) = 0.07;
 D(2) = 0.032;
 D(3) = 0.0095;
-
-
-
 % ------ PSAT/MATPOWER initialization ------
 % MATPOWER INIT
 MPC = loadcase(CASE_FILE);
 % PMAX vector of generators
-PMAX = 9;
+PMAX = 9;VMAX = 12;
 gIdx = util.getGenList(MPC);
-gMaxVec = MPC.gen(gIdx,PMAX)./MPC.baseMVA; % TODO: remove slack
+allGIdx = MPC.gen(:,1);
+gMaxVec = [MPC.gen(gIdx,PMAX)./MPC.baseMVA; MPC.bus(allGIdx,VMAX)]; % TODO: remove slack
 % PSAT INIT
 ps = psat('command_line_psat',true,'nosplash',true);
 ps.clpsat.mesg = 0;
@@ -125,7 +134,7 @@ if PRINT
 end
 while i <= K_max
     while dist > D_min && i <= K_max
-        alpha_k = getStepSize(dist, gMaxVec);%,'epsLims',E,'dLims',D);
+        alpha_k = getStepSize(dist, gMaxVec,'epsLims',E,'dLims',D);
         % get the gradient
         gradDir = getStepDir(ps,nSP,DR,'zetaMin',ZETAMIN,'print',PRINT);
         % calculate new set point
@@ -170,14 +179,14 @@ while i <= K_max
     % we are in HIC
     % take samples around the current point
     NEW_DS_POINTS = [NEW_DS_POINTS; nSP];                   %#ok FOR NOW DO NOT PREALLOCATE
-    NEW_DS_POINTS = [NEW_DS_POINTS; getHICSamples(nPG,nSP,MPC)]; %#ok FOR NOW DO NOT PREALLOCATE
+    NEW_DS_POINTS = [NEW_DS_POINTS; getHICSamples(nSP,MPC)]; %#ok FOR NOW DO NOT PREALLOCATE
     % take the next step with the minimum step size -> no step size calc
     % take the next step to the direction where the DR stays the same/close
     %     gradDir = getHICStepDir(ps, nSP, DR);
-    gradDir = getStepDir(ps, nSP, DR,'zetaMin',ZETAMIN,'print',PRINT);
+    gradDir =  getStepDirPV(ps, nSP, DR, 'print',PRINT,'zetaMin',ZETAMIN);
     alpha_k = step_min;
     % calculate the new set point
-    nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
+    nSP = nSP + (alpha_k .* gradDir)';
     % take the step: set psat object to new set point values
     ps.PSet(nSP);
     ps.runpsat('pf');
@@ -188,15 +197,14 @@ while i <= K_max
     if PRINT
         etH.String = ['Elapsed time: ' util.getTimeElapsed(et)];
         drLine{i} = plot.plotDwUpdate(ax,i,DR,feasProp,nSP);
-    end
     %     fprintf('nSP ')
     %     disp(nSP)
     %     fprintf('DR ')
     %     disp(DR)
     %     fprintf('dist ')
     %     disp(dist)
-    
-    [LIDX, ~]=ismember(nSP(1:nPG), NEW_DS_POINTS(:,1:nPG),'rows');
+    end   
+    [LIDX, ~]=ismember(nSP, NEW_DS_POINTS,'rows');
     if LIDX
         warning('PSDC:DW','New setpoint already in data set. Exiting dw.')
         break
