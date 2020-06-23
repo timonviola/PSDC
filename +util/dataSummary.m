@@ -17,10 +17,16 @@ t = tic;
 readTVarsDefault = false;
 zetaMinDefault = 0.03;
 p = inputParser;
+addRequired(p,'setPointsCsv',@(x) ismember(class(x),{'string','char'}))
+addRequired(p,'psatFile', @(x) ismember(class(x),{'string','char'}))
+addRequired(p,'mpFile', @(x) ismember(class(x),{'string','char'}))
 addOptional(p,'zetaMin',zetaMinDefault,@(x) isnumeric(x));
 addParameter(p,'readTableVariables',readTVarsDefault,@(x) islogical(x));
-parse(p,setPointsCsv,psatFile,mpFile,varargin{:})
 
+parse(p,setPointsCsv,psatFile,mpFile,varargin{:})
+setPointsCsv = p.Results.setPointsCsv;
+psatFile = p.Results.psatFile;
+mpFile = p.Results.mpFile;
 zetaMin = p.Results.zetaMin;
 readTVars = p.Results.readTableVariables;
 
