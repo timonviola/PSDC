@@ -9,10 +9,17 @@ zetaMinDefault = 0.03;
 printDefault = false;
 imDefault = {};
 p = inputParser;
+addRequired(p,'ps')
+addRequired(p,'setPoints')
+addRequired(p,'curDR')
 addOptional(p,'zetaMin',zetaMinDefault , @(x)isnumeric(x))
 addParameter(p,'print',printDefault, @(x)islogical(x))
 addParameter(p,'imwrite',imDefault)
-parse(p,varargin{:})
+parse(p,ps,setPoints,curDR,varargin{:})
+
+ps = p.Results.ps;
+setPoints = p.Results.setPoints;
+curDR = p.Results.curDR;
 zetaMin = p.Results.zetaMin;
 PRINT = p.Results.print;
 im = p.Results.imwrite;

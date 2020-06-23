@@ -25,7 +25,7 @@ import DirectedWalks.*
 D_min = 0.0025;
 % max number of iterations
 K_max = 1e2;
-SmallestStepSizeScale = 0.05;
+SmallestStepSizeScale = 0.5;
 HICStepSizeScale = 0.005; % TODO: make sure that its consistents with alpha
 
 
@@ -36,7 +36,7 @@ MPC = loadcase(CASE_FILE);
 PMAX = 9;VMAX = 12;
 gIdx = util.getGenList(MPC);
 allGIdx = MPC.gen(:,1);
-gMaxVec = [MPC.gen(gIdx,PMAX)./MPC.baseMVA; MPC.bus(allGIdx,VMAX)]; % TODO: remove slack
+gMaxVec = [MPC.gen(gIdx,PMAX)./MPC.baseMVA; MPC.bus(allGIdx,VMAX)];
 % PSAT INIT
 ps = psat('command_line_psat',true,'nosplash',true);
 ps.clpsat.mesg = 0;
@@ -106,9 +106,9 @@ while i <= K_max
     while dist > D_min && i <= K_max
         alpha_k = step_min;
         % get the gradient
-        gradDir = getGreedy(ps, nSP, DR,'print',PRINT);
+        gradDir = getGreedy(ps, nSP, DR,'zetaMin',zetaMin,'print',PRINT);
         % calculate new set point
-        nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
+        nSP = nSP + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values
         ps.PSet(nSP);
         ps.runpsat('pf');

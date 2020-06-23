@@ -29,10 +29,16 @@ printDefault = {};
 zetaMinDefault = 0.03;
 
 p = inputParser;
+addRequired(p,'setPoints',@(x) isnumeric(x))
+addRequired(p,'psatFName')
+addRequired(p,'matpowerFName')
 addOptional(p,'zetaMin',zetaMinDefault , @(x)isnumeric(x))
 addParameter(p,'print',printDefault, @(x) ismember(x,printOptions) || iscell(x))
-parse(p,varargin{:})
+parse(p,setPoints,psatFName,matpowerFName,varargin{:})
 
+setPoints = p.Results.setPoints;
+psatFName = p.Results.psatFName;
+matpowerFName = p.Results.matpowerFName;
 zetaMin = p.Results.zetaMin;
 PRINT = p.Results.print;
 if ~iscell(PRINT)

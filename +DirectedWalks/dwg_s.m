@@ -37,7 +37,7 @@ if PRINT
 end
 
 
-
+ZETAMIN = 0.0125;
 
 % ----- start of function -----
 % inputs
@@ -55,9 +55,11 @@ HICStepSizeScale = 0.005;
 % MATPOWER INIT
 MPC = loadcase(CASE_FILE);
 % PMAX vector of generators
-PMAX = 9;
+PMAX = 9; VMAX = 12;
 gIdx = util.getGenList(MPC);
-gMaxVec = MPC.gen(gIdx,PMAX)./MPC.baseMVA; % TODO: remove slack
+allGIdx = MPC.gen(:,1);
+% Vector of max PGs and voltages
+gMaxVec = [MPC.gen(gIdx,PMAX)./MPC.baseMVA; MPC.bus(allGIdx,VMAX)]; % TODO: remove slack
 % PSAT INIT
 ps = psat('command_line_psat',true,'nosplash',true);
 ps.clpsat.mesg = 0;
@@ -82,12 +84,12 @@ buff = rand(1,nBuff);
 % array of set points
 NEW_DS_POINTS = [];
 % get current zeta
-[~, curDR] = SmallSignalStability.checkSmallSignalStability(.03, ps.LA.a);
+[~, curDR] = SmallSignalStability.checkSmallSignalStability(ZETAMIN, ps.LA.a);
 % number of generators except slack
 nPG = size(ps.PV.store,1);
 % init DW variables
 DR = curDR;
-dist = getDist(DR);
+dist = getDist(DR,ZETAMIN);
 buff(nBuff) = DR;
 nSP = setPoint;
 ps.PVSet(nSP);
@@ -127,7 +129,7 @@ end
 EXIT = false;
 im = {};
 if PRINT
-    [fig, ax, prop] = plot.plotDWInit('legend',true); % ax
+    [fig, ax, prop] = plot.plotDWInit('zetaMin',ZETAMIN,'legend',true); % ax
     [etH, et] = plot.addTimeElapsedBox(fig);
     drLine = cell(K_max,1);
     drLine{i} = plot.plotDwUpdate(ax,0,DR,prop,nSP);
@@ -137,24 +139,22 @@ if PRINT
 end
 while i <= K_max
     while dist > D_min && i <= K_max
-%         alpha_k = getStepSize(dist, gMaxVec);%,'epsLims',E,'dLims',D);
+        %         alpha_k = getStepSize(dist, gMaxVec);%,'epsLims',E,'dLims',D);
         alpha_k = step_min;
         
         % get the gradient
-        [gradDir, im] = getGreedy(ps, nSP, DR,'print',PRINT,'imwrite',im);
+        [gradDir, im] = getGreedy(ps, nSP, DR,'zetaMin',ZETAMIN,'print',PRINT,'imwrite',im);
         % calculate new set point
-        nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
+        nSP = nSP + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values
         ps.PSet(nSP);
         ps.runpsat('pf');
         ps.fm_abcd();
         % get new DR
-        [~, DR] = SmallSignalStability.checkSmallSignalStability(.03, ps.LA.a);
+        [~, DR] = SmallSignalStability.checkSmallSignalStability(ZETAMIN, ps.LA.a);
         buff = circshift(buff,-1);
         buff(nBuff) = DR;
-        dist = getDist(DR);
-%         fprintf('nSP ')
-%         disp(nSP)
+        dist = getDist(DR,ZETAMIN);
         
         if PRINT
             etH.String = ['Elapsed time: ' util.getTimeElapsed(et)];
@@ -189,14 +189,14 @@ while i <= K_max
     % we are in HIC
     % take samples around the current point
     NEW_DS_POINTS = [NEW_DS_POINTS; nSP];                   %#ok FOR NOW DO NOT PREALLOCATE
-    NEW_DS_POINTS = [NEW_DS_POINTS; getHICSamples(nPG,nSP,MPC)]; %#ok FOR NOW DO NOT PREALLOCATE
+    NEW_DS_POINTS = [NEW_DS_POINTS; getHICSamplesRnd(nSP,MPC)]; %#ok FOR NOW DO NOT PREALLOCATE
     % take the next step with the minimum step size -> no step size calc
     % take the next step to the direction where the DR stays the same/close
     %     gradDir = getHICStepDir(ps, nSP, DR);
-    [gradDir,im] = getGreedy(ps, nSP, DR, 'print',PRINT,'imwrite',im);
+    [gradDir,im] = getGreedy(ps, nSP, DR,'zetaMin',ZETAMIN,'print',PRINT,'imwrite',im);
     alpha_k = gMaxVec.*HICStepSizeScale;
     % calculate the new set point
-    nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
+    nSP = nSP + (alpha_k .* gradDir)';
     % take the step: set psat object to new set point values
     ps.PSet(nSP);
     ps.runpsat('pf');
@@ -210,17 +210,15 @@ while i <= K_max
         frame = getframe(gcf);
         imIdx = length(im)+1;
         im{imIdx} = frame2im(frame);
+        %     fprintf('nSP ')
+        %     disp(nSP)
+        %     fprintf('DR ')
+        %     disp(DR)
+        %     fprintf('dist ')
+        %     disp(dist)
     end
-    % get new dist??? as well? so if we diverge from boundary we take dw
-    % again to go back close to boundary
-%     fprintf('nSP ')
-%     disp(nSP)
-%     fprintf('DR ')
-%     disp(DR)
-%     fprintf('dist ')
-%     disp(dist)
     
-    [LIDX, ~]=ismember(nSP(1:nPG), NEW_DS_POINTS(:,1:nPG),'rows');
+    [LIDX, ~]=ismember(nSP, NEW_DS_POINTS,'rows');
     if LIDX
         warning('PSDC:DW','New setpoint already in data set. Exiting dw.')
         break
@@ -230,7 +228,7 @@ end
 toc(t1)
 % % APPEND TO DATA_SET.CSV the NEW_DS_POINTS vector
 % writematrix(NEW_DS_POINTS,'set_points_case9_1.csv');
-% 
+%
 % util.dataSummary
 if PRINT && GIF
     filename = 'testAnimated.gif'; % Specify the output file name

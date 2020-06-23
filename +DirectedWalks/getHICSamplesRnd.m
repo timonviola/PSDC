@@ -2,7 +2,7 @@ function samples = getHICSamplesRnd(setPoint, MPC, varargin)
 
 
 N = 1e3;
-tol = 0.05;
+tol = 0.01;
 
 samples = rand(N,length(setPoint));
 alpha = DirectedWalks.getAlpha(MPC);
