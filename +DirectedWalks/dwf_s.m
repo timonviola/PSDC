@@ -17,18 +17,19 @@
 % CASE_FILE = 'case_files/case14.m';
 % PSAT_FILE = 'case_files\d_case14.m';
 
-ACOPF_SEED = '.data\case39_2020_06_16T103242Z\case39_ACOPF.csv';%'.data/case9_ACOPF.csv';
-CASE_FILE = 'case_files/case39.m';
-PSAT_FILE = 'case_files\d_case39.m';
+% ACOPF_SEED = '.data\case39_2020_06_16T103242Z\case39_ACOPF.csv';%'.data/case9_ACOPF.csv';
+% CASE_FILE = 'case_files/case39.m';
+% PSAT_FILE = 'case_files\d_case39.m';
 % 
-% ACOPF_SEED = '.data/case68_2020_06_16T105316Z/case68_ACOPF.csv';
-% CASE_FILE = 'case_files/case68.m';
-% PSAT_FILE = 'case_files/d_case68.m';
+% ACOPF_SEED = '.data/case68_2020_06_23T120826Z/case68_ACOPF.csv';
+ACOPF_SEED = '.data/case68_2020_06_23T161833Z/case68_ACOPF_mod.csv';
+CASE_FILE = 'mod_case68.m';
+PSAT_FILE = 'case_files/d_case68.m';
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,util.natsort(acopfResults.Properties.VariableNames));
 % setPoints = acopfResults{100,:};
-setPoint = acopfResults{158,:}; %-> pingpoing at dist = 0.0055
+setPoint = acopfResults{93,:}; %-> pingpoing at dist = 0.0055
 
 % enable plotting
 PRINT = true;
@@ -45,7 +46,8 @@ end
 % ZETAMIN = 0.03;
 
 % CASE39 & CASE68
-ZETAMIN = 0.0125;
+% ZETAMIN = 0.0125;
+ZETAMIN = 0.03;
 % ----- start of function -----
 % inputs
 import DirectedWalks.*
@@ -99,17 +101,16 @@ buff = rand(1,nBuff);
 % array of set points
 NEW_DS_POINTS = [];%cell{K_max, nDim};
 % get current zeta
-[~, curDR] = SmallSignalStability.checkSmallSignalStability(ZETAMIN, ps.LA.a);
+
 % number of generators except slack
 nPG = size(ps.PV.store,1);
 % init DW variables
-DR = curDR;
-dist = getDist(DR,'zetaMin',ZETAMIN);
-buff(nBuff) = DR;
+
 nSP = setPoint;
 ps.PVSet(nSP);
 ps.runpsat('pf')
 ps.fm_abcd();
+
 
 % ------ preliminary set point check ------
 % This check is neccessary in case that the OPF constraints are stricter
@@ -137,7 +138,10 @@ if ~opfStab
         return
     end
 end
-
+[~, curDR] = SmallSignalStability.checkSmallSignalStability(ZETAMIN, ps.LA.a);
+DR = curDR;
+dist = getDist(DR,'zetaMin',ZETAMIN);
+buff(nBuff) = DR;
 
 EXIT = false;
 im = {};
@@ -214,7 +218,7 @@ while i <= K_max
     %     nSP(1:nPG) = nSP(1:nPG) + (alpha_k .* gradDir)';
     nSP = nSP + (alpha_k .* gradDir)';
     % take the step: set psat object to new set point values
-    ps.PSet(nSP);
+    ps.PVSet(nSP);
     ps.runpsat('pf');
     ps.fm_abcd();
     % get new DR

@@ -110,7 +110,7 @@ while i <= K_max
         % calculate new set point
         nSP = nSP + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values
-        ps.PSet(nSP);
+        ps.PVSet(nSP);
         ps.runpsat('pf');
         ps.fm_abcd();
         % get new DR
@@ -159,7 +159,7 @@ while i <= K_max
     % calculate the new set point
     nSP = nSP + (alpha_k .* gradDir)';
     % take the step: set psat object to new set point values
-    ps.PSet(nSP);
+    ps.PVSet(nSP);
     ps.runpsat('pf');
     ps.fm_abcd();
     % get new DR

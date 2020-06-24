@@ -16,15 +16,17 @@
 % ACOPF_SEED = '.data/case14_2020_06_08T110325Z/case14_ACOPF.csv';%'.data/case9_ACOPF.csv';
 % CASE_FILE = 'case_files/case14.m';
 % PSAT_FILE = 'case_files\d_case14m';
-
-ACOPF_SEED = '.data\case39_2020_06_16T103242Z\case39_ACOPF.csv';%'.data/case9_ACOPF.csv';
-CASE_FILE = 'case_files/case39.m';
-PSAT_FILE = 'case_files\d_case39.m';
-
+% 
+% ACOPF_SEED = '.data\case39_2020_06_16T103242Z\case39_ACOPF.csv';%'.data/case9_ACOPF.csv';
+% CASE_FILE = 'case_files/case39.m';
+% PSAT_FILE = 'case_files\d_case39.m';
+ACOPF_SEED = '.data/case68_2020_06_23T161833Z/case68_ACOPF_mod.csv';
+CASE_FILE = 'mod_case68.m';
+PSAT_FILE = 'case_files/d_case68.m';
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
-acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));
-setPoint = acopfResults{2,:};
+acopfResults = acopfResults(:,util.natsort(acopfResults.Properties.VariableNames));
+setPoint = acopfResults{93,:};
 
 % enable plotting
 PRINT = true;
@@ -37,7 +39,7 @@ if PRINT
 end
 
 
-ZETAMIN = 0.0125;
+ZETAMIN = 0.03;%125;
 
 % ----- start of function -----
 % inputs
@@ -147,7 +149,7 @@ while i <= K_max
         % calculate new set point
         nSP = nSP + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values
-        ps.PSet(nSP);
+        ps.PVSet(nSP);
         ps.runpsat('pf');
         ps.fm_abcd();
         % get new DR
@@ -198,7 +200,7 @@ while i <= K_max
     % calculate the new set point
     nSP = nSP + (alpha_k .* gradDir)';
     % take the step: set psat object to new set point values
-    ps.PSet(nSP);
+    ps.PVSet(nSP);
     ps.runpsat('pf');
     ps.fm_abcd();
     % get new DR
