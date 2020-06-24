@@ -1,10 +1,11 @@
 % parallel directed walks
 t2 = tic;
-OUT_DIR =  '.data/case39_2020_06_16T103242Z/';
-ACOPF_SEED = [OUT_DIR 'case39_ACOPF.csv'];
-PSAT_FILE = ['case_files' filesep 'd_case39.m'];
-CASE_NAME = 'case39';
-CASE_FILE = [pwd filesep 'case_files' filesep 'case39.m'];
+OUT_DIR = '.data/case68_2020_06_23T161833Z/'; % '.data/case39_2020_06_16T103242Z/';
+ACOPF_SEED = [OUT_DIR 'case68_ACOPF_mod.csv'];
+PSAT_FILE = ['case_files' filesep 'd_case68.m'];
+CASE_NAME = 'case68';
+%CASE_FILE = [pwd filesep 'case_files' filesep 'mod_case68.m'];
+CASE_FILE = [pwd filesep 'mod_case68.m'];
 if ~ispc
     util.add_dependencies
 end
@@ -36,7 +37,7 @@ if ispc
 else
     % load the default cluster profile
     clust=parcluster('clusterProfileElektro2019');
-    numw = 64;
+    numw = 120;
     p = parpool(clust, numw);
 end
 disp(p)
@@ -56,7 +57,7 @@ p.addAttachedFiles(CASE_FILE);
 pw = textBar(N,'Parallel Directed walks');
 parfor i = 1:N
     writematrix( ...
-        DirectedWalks.dwf_f(acopfResults{i,:},PSAT_FILE,CASE_FILE,0.0125),...
+        DirectedWalks.dwg_f(acopfResults{i,:},PSAT_FILE,CASE_FILE),...
         [OUT_DIR 'dw_set_points' CASE_NAME '_' num2str(i) '.csv']);
    increment(pw)
 end
