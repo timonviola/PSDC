@@ -93,30 +93,42 @@ p.addAttachedFiles(mpFile);
 % Progressbar that shows on STDOUT
 pw = textBar(N,'Parallel checks');
 
-
-t2 = tic;
-parfor i = 1:N
-    [stable(i), classDetails{i}, dampingRatio(i)] = ... 
-        DirectedWalks.checkSetpoint(res{i,:},psatFile,mpFile,zetaMin);
-    increment(pw)
+try
+    t2 = tic;
+    parfor i = 1:N
+        [stable(i), classDetails{i}, dampingRatio(i)] = ... 
+            DirectedWalks.checkSetpoint(res{i,:},psatFile,mpFile,zetaMin);
+        increment(pw)
+    end
+    delete(pw)
+    toc(t2)
+    % save to the right folder with the right name
+    if contains(setPointsCsv,'/')
+        fName = strsplit(setPointsCsv,'/');
+        fPath = strjoin(fName(1:end-1),'/');
+    elseif contains(setPointsCsv,'\')
+        fName = strsplit(setPointsCsv,'/');
+        fPath = strjoin(fName(1:end-1),'/');
+    else
+        fName = setPointsCsv;
+        fPath = '';
+    end
+    if ~isa(fName,'char') || isa(fName,'string')
+        fName = strsplit(fName{end},'.');
+        fSaveName = [fPath filesep fName{1} '_summary.mat'];
+    else
+        fName = strsplit(fName,'.');
+        fSaveName = [fName{1} '_summary.mat'];
+    end
+    fprintf('Summay is saved as: %s\n',fSaveName)
+    save(fSaveName,'stable','classDetails','dampingRatio')
+catch
+   fprintf('Error - trying to save what we can\n')
+   save('error_summary.mat','stable','classDetails','dampingRatio')
 end
-delete(pw)
-toc(t2)
-% save to the right folder with the right name
-if contains(setPointsCsv,'/')
-    fName = strsplit(setPointsCsv,'/');
-    fPath = strjoin(fName(1:end-1),'/');
-elseif contains(setPointCsv,'\')
-    fName = strsplit(setPointsCsv,'/');
-    fPath = strjoin(fName(1:end-1),'/');
-else
-    fName = setPointsCsv;
-    fPath = '';
-end
-fName = strsplit(fName{end},'.');
-fSaveName = [fPath filesep fName{1} '_summary.mat'];
-fprintf('Summay is saved as: %s\n',fSaveName)
-save(fSaveName,'stable','classDetails','dampingRatio')
-
 %% print
 util.printDataSummary(stable, classDetails)
+
+
+
+
