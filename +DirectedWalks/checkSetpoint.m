@@ -57,25 +57,8 @@ ps.Settings.pv2pq = 0;
 ps.runpsat(psatFName,'data')
 ps.runpsat('pf') 
 
-%TODO: use ps.PVSet
 
-% ----- Set P_g, V_g -----
-PG = 4; VG = 5;
-nPG = size(ps.PV.store,1);
-% Set power-flow data 
-%   PV (generator) buses - section 10.5
-generatorData = ps.PV.store;
-[~,sortIdx] = sort(generatorData(:,1));
-% set PGs 
-generatorData(sortIdx,PG) = setPoints(1:nPG);
-slackData = ps.SW.store;
-% set slack voltage!
-slackData(4) = setPoints(nPG+1); 
-% set gen voltages
-generatorData(sortIdx,VG) = setPoints(nPG+2:end);
-% re-assign modified values to psat obj
-ps.SW.store = slackData;
-ps.PV.store = generatorData;
+ps.PVSet(setPoints);
 % run modified pf
 ps.runpsat('pf');
 % power flow results, 'print' option available
@@ -92,8 +75,6 @@ if ~opfStab
     end    
     % try with enforced q-limits
     ps.Settings.pv2pq = 1;
-    ps.SW.store = slackData;
-    ps.PV.store = generatorData;
     ps.runpsat('pf');
     res = ps.powerFlowResults(PRINT{:});
     [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
