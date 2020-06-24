@@ -51,7 +51,8 @@ if(decorators)
 end
 defaultAxesStyle = {'LineStyle',':',...
     'Color','0.65,0.65,0.65',...
-    'HandleVisibility','off'};
+    'HandleVisibility','off',... % hide it from user
+    'HitTest','off','PickableParts','none'}; % can't click on it so its easier to click on eigenvalues
 l.x = yline(0,defaultAxesStyle{:});
 l.y = xline(0,defaultAxesStyle{:});
 

@@ -21,7 +21,9 @@ y = @(x) x*(sqrt(1e4-d^2)/d);
 xv = linspace(0,axh.XLim(1),100);
 defaultAxesStyle = {'LineStyle','--',...
     'Color','0.85,0.33,0.10',...
-    'HandleVisibility','off'};
+    'HandleVisibility','off',...
+    'PickableParts','none',... % user can't click so it's easier
+    'HitTest','off'}; % to open eigenvalues context menu
 ph(1) = plot(xv,y(xv),defaultAxesStyle{:});
 ph(2) = plot(xv,-1*y(xv),defaultAxesStyle{:});
 
