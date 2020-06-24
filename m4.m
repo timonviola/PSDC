@@ -1,18 +1,8 @@
 % fit a normal distribution to feasible points
-<<<<<<< HEAD
 load('.data/case14_dwg/unified_case14_summary.mat')
 setpoints = readmatrix(".data/case14_dwg/unified_case14.csv","Delimiter",",");
 NSAMPLES = 2e5;
-=======
-load('.data\case9_2020_06_08T144804Z\unified_case9_summary.mat')
-setpoints = readmatrix("unified_case14dwg.csv","Delimiter",",");
 
-
-
-
-%%
-NSAMPLES = 1e5;
->>>>>>> build: experiment with case39
 %  
 %
 idxStablePoints = (stable == 1);
