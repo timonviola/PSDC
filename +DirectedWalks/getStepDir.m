@@ -28,7 +28,7 @@ im = p.Results.imwrite;
 % if ~(getDist(curDR) < 0.006)
 %     mu = 0.05;
 % else
-    mu = 0.0005;
+    mu = 1;
 % end
 PG = 4;
 nPG = size(ps.PV.store,1);
