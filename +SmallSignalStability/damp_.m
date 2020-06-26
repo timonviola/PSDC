@@ -1,6 +1,4 @@
 % DAMP_ Natural frequency and damping of linear system dynamics.
-function varargout = damp_(As)
-% DAMP_ Natural frequency and damping of linear system dynamics.
 % [Wn,Z,P] = DAMP_(AS) also returns the poles P of SYS.
 % Modified version of MATLAB built in DAMP function. 
 % calculate the modal parameeters of A matrix:
@@ -11,6 +9,7 @@ function varargout = damp_(As)
 %   MATLAB                      (9.8)
 %   Control System Toolbox      (14.0)
 
+function varargout = damp_(As)
 
     try
         [wn,zeta,p] = damp(As);
