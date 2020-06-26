@@ -23,9 +23,7 @@ Powertrain Blockset                                   Version 1.5         (R2019
 Statistics and Machine Learning Toolbox               Version 11.5        (R2019a)
 Symbolic Math Toolbox                                 Version 8.3         (R2019a)
 MDTools
-
-
-PSAT*                                                 Version 2.1.11      (R2019a)
+OOPSAT                                                Version 0.1         (R2020a)
 ```
 PSAT*: custom modifications were added to the referenced version of the package.
 
@@ -47,15 +45,16 @@ R version 4.0.0 (2020-04-24)
 
 # Installation
 Some tips and notes on installing non-trivial dependencies are given below.
+All dependencies are listed above.
 
-## PSAT
+Download or even better - clone PSDC and add it to your MATLAB path. You might want to add the subpackages of PSDC as well to prevent extensive usage of `import`.
+
+## OOPSAT
+PSDC builds on OOPSAT, which can be downloaded from here [OOPSAT](www.github.com/timonviola/oopsat). After downloading make sure that you add OOPSAT to your MATLAB path (recommended to add it to the bottom of your path list).
+
 PSAT can be downloaded from [http://faraday1.ucd.ie/psat.html](http://faraday1.ucd.ie/psat.html)
-however some custom changes/local fixes were added. Consequently, it is recommended
-to use the version at [./psat](the local copy).
-
-Upon installation of psat add the psat folder (and its subfolders) to the 
-MATLAB path. Make sure to **add PSAT to the bottom** of your MATLAB path list
-otherwise internal MATLAB settings will be shadowed.
+however some custom changes/local fixes are added. Consequently, it is recommended
+to use OOPSAT.
 
 # Tests
 To check if all (MATLAB) dependencies are properly installed run
