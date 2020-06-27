@@ -75,7 +75,7 @@ if ispc
 else
     % load the default cluster profile
     clust=parcluster('clusterProfileElektro2019');
-    numw = 64;
+    numw = 128;
     p = parpool(clust, numw);
 end
 disp(p)
