@@ -29,8 +29,8 @@ im = p.Results.imwrite;
 mu = 0.0005;
 % if dist is <= than this, we take it
 curDist = getDist(curDR);
-GREEDTOL = 0.999995; % TODO: define in percentage
-% GREEDTOL = 1;
+% GREEDTOL = 0.999995; % TODO: define in percentage
+GREEDTOL = 0.996;
 isInGreedyTol = @(x) getDist(x,zetaMin) <= curDist*GREEDTOL;
 % GREEDYQUIT = false;
 
