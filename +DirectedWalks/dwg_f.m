@@ -26,8 +26,8 @@ D_min = 0.0025;
 % max number of iterations
 K_max = 1e2;
 SmallestStepSizeScale = 0.5;
-HICStepSizeScale = 0.005; % TODO: make sure that its consistents with alpha
-
+% HICStepSizeScale = 0.005; % TODO: make sure that its consistents with alpha
+HICStepSizeScale = 0.05; % case39 only
 
 % ------ PSAT/MATPOWER initialization ------
 % MATPOWER INIT
