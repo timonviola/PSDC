@@ -17,16 +17,17 @@
 % CASE_FILE = 'case_files/case14.m';
 % PSAT_FILE = 'case_files\d_case14m';
 % 
-% ACOPF_SEED = '.data\case39_2020_06_16T103242Z\case39_ACOPF.csv';%'.data/case9_ACOPF.csv';
-% CASE_FILE = 'case_files/case39.m';
-% PSAT_FILE = 'case_files\d_case39.m';
-ACOPF_SEED = '.data/case68_2020_06_23T161833Z/case68_ACOPF_mod.csv';
-CASE_FILE = 'mod_case68.m';
-PSAT_FILE = 'case_files/d_case68.m';
+ACOPF_SEED = '.data/int_case39_2020_06_27T112122Z/int_case39_ACOPF.csv';%'.data/case9_ACOPF.csv';
+CASE_FILE = 'case_files/int_case39.m';
+PSAT_FILE = 'case_files/d_case39.m';
+%
+% ACOPF_SEED = '.data/case68_2020_06_23T161833Z/case68_ACOPF_mod.csv';
+% CASE_FILE = 'mod_case68.m';
+% PSAT_FILE = 'case_files/d_case68.m';
 
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,util.natsort(acopfResults.Properties.VariableNames));
-setPoint = acopfResults{93,:};
+setPoint = acopfResults{33,:};
 
 % enable plotting
 PRINT = true;
@@ -39,7 +40,7 @@ if PRINT
 end
 
 
-ZETAMIN = 0.03;%125;
+ZETAMIN = 0.015;%125;
 
 % ----- start of function -----
 % inputs
@@ -51,7 +52,8 @@ D_min = 0.0025;%zeta_crit*0.25 0.03*1.0909 && 0.03*(1 - 0.0909)
 % max number of iterations
 K_max = 1e2;
 SmallestStepSizeScale = 0.5;
-HICStepSizeScale = 0.005;
+% Discretization factor
+HICStepSizeScale = 0.05;
 
 % ------ PSAT/MATPOWER initialization ------
 % MATPOWER INIT
@@ -145,7 +147,7 @@ while i <= K_max
         alpha_k = step_min;
         
         % get the gradient
-        [gradDir, im] = getGreedy(ps, nSP, DR,'zetaMin',ZETAMIN,'print',PRINT,'imwrite',im);
+        [gradDir, im] = getGreedyLims(ps, nSP, DR, MPC, alpha_k,'zetaMin',ZETAMIN,'print',PRINT,'imwrite',im);
         % calculate new set point
         nSP = nSP + (alpha_k .* gradDir)';
         % take the step: set psat object to new set point values
@@ -195,8 +197,9 @@ while i <= K_max
     % take the next step with the minimum step size -> no step size calc
     % take the next step to the direction where the DR stays the same/close
     %     gradDir = getHICStepDir(ps, nSP, DR);
-    [gradDir,im] = getGreedy(ps, nSP, DR,'zetaMin',ZETAMIN,'print',PRINT,'imwrite',im);
     alpha_k = gMaxVec.*HICStepSizeScale;
+    [gradDir,im] = getGreedyLims(ps, nSP, DR, MPC, alpha_k,'zetaMin',ZETAMIN,'print',PRINT,'imwrite',im);
+   
     % calculate the new set point
     nSP = nSP + (alpha_k .* gradDir)';
     % take the step: set psat object to new set point values
@@ -231,7 +234,11 @@ toc(t1)
 % % APPEND TO DATA_SET.CSV the NEW_DS_POINTS vector
 % writematrix(NEW_DS_POINTS,'set_points_case9_1.csv');
 %
+
+
+NEW_DS_POINTS = uniquetol(NEW_DS_POINTS,HICStepSizeScale,'ByRows',true);
 % util.dataSummary
+
 if PRINT && GIF
     filename = 'testAnimated.gif'; % Specify the output file name
     nImages = length(im);
