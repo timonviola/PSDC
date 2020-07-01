@@ -1,25 +1,33 @@
 %CHECKSETPOINT Check setpoint feasibility.
-%   Check if setpoint passes the given criteria (e.g.:opf limits, SSS).
-%
-%   class = CHECKSETPOINT(setPoints, psatFName, matpowerFName) the
-%   setpoint is defined by the vector of [P_g, V_g], the system dynamic data
-%   is given by psatFName and the sytem OPF data is given by matpowerFName)
+%   class = CHECKSETPOINT(setPoints, psatFName, matpowerFName) returns the
+%   the binary classification of the set point.The set point is defined by
+%   the vector of [P_g, V_g] values. The system is defined by the dynamic
+%   data file (psatFName) and the static data file (matpowerFName).
 %
 %   [class, details, dampingRatio] = CHECKSETPOINT(setPoints,
-%   psatFName,matpowerFName) 
+%   psatFName,matpowerFName) returns classification details where details
+%   is a binary classification vector and has the following elements:
+%     o Pg generator real power
+%     o Qg generator reactive power
+%     o Vbus bus voltage magnitude
+%     o S branch flows
+%     o Small-signal stability
+%   in each case 1 means no violation and 0 means the criteria was
+%   violated.
+%   dampingRatio is the smallest undamped natural frequency of the power 
+%   system. Small signal stability depends on wether this value is larger
+%   equal to zetaMin.
 %
-%   setPoints - the values that define the setpoint in the load-flow (Pg,Vg)
-%   psatFName - the dynamic data file name
-%   matpowerFName - the OPF data name, the variable bounds are extracted 
-%   from this file.
+%   [__] = CHECKSETPOINT(__,Name,Value) uses additional options specified
+%   by one or more Name-Value pair arguments. Possible name-value pairs:
+%      zetaMin - Redefine the critical damping ratio. Default = 0.03.
+%      print   - Output power-flow and criteria check results to the
+%                command windows.
 %
-%   Input arguments:
-%     o setPoints! [scalar,numeric] Generator P_g and V_g that uniquly
-%     specifies a setpoint of the system.
-%     o psatFName! [file=*.m]
-%
-%   See also SMALLSIGNALSTABILITY.CHECKSMALLSIGNALSTABILITY,
+%   See also PSAT.PVSET, SMALLSIGNALSTABILITY.CHECKSMALLSIGNALSTABILITY,
 %   DIRECTEDWALKS.CHECKOPFLIMITS.
+
+% Copyright (C) 2020 Timon Viola
 function varargout = checkSetpoint(setPoints,...
      psatFName,matpowerFName,varargin)
 % PSAT is initialized inside the function to support parallel excecution.
