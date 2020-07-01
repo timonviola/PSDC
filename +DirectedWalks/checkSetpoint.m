@@ -24,6 +24,14 @@
 %      print   - Output power-flow and criteria check results to the
 %                command windows.
 %
+%   Example
+%      import DirectedWalks.checkSetpoint
+%      mF = 'case_files/case14.m';
+%      pF = 'case_files/d_case14.m';
+%      setP = [ 0.52  0.12  0.29  0.8  0.97  0.96  0.99  0.94  0.94];
+%      [stab, class_det, dr] = CHECKSETPOINT(setP,pF,mF,...
+%                              'zetaMin',0.025,'print',{'print'})
+%
 %   See also PSAT.PVSET, SMALLSIGNALSTABILITY.CHECKSMALLSIGNALSTABILITY,
 %   DIRECTEDWALKS.CHECKOPFLIMITS.
 
