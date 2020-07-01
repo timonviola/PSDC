@@ -13,16 +13,12 @@ MATLAB Version: 9.6.0.1307630 (R2019a) Update 7
 
 -----------------------------------------------------------------------------------------------------
 MATLAB                                                Version 9.6         (R2019a)
-Simulink                                              Version 9.3         (R2019a)
 MATPOWER                                              Version 6.0                 
 OPTI Toolbox                                          Version 2.28        (R2017b)
 Optimization Toolbox                                  Version 8.3         (R2019a)
 Parallel Computing Toolbox                            Version 7.0         (R2019a)
-Partial Differential Equation Toolbox                 Version 3.2         (R2019a)
-Powertrain Blockset                                   Version 1.5         (R2019a)
 Statistics and Machine Learning Toolbox               Version 11.5        (R2019a)
 Symbolic Math Toolbox                                 Version 8.3         (R2019a)
-MDTools
 OOPSAT                                                Version 0.1         (R2020a)
 ```
 PSAT*: custom modifications were added to the referenced version of the package.
@@ -50,7 +46,7 @@ All dependencies are listed above.
 Download or even better - clone PSDC and add it to your MATLAB path. You might want to add the subpackages of PSDC as well to prevent extensive usage of `import`.
 
 ## OOPSAT
-PSDC builds on OOPSAT, which can be downloaded from here [OOPSAT](www.github.com/timonviola/oopsat). After downloading make sure that you add OOPSAT to your MATLAB path (recommended to add it to the bottom of your path list).
+PSDC builds on OOPSAT, which can be downloaded from here [OOPSAT](https://github.com/timonviola/oopsat). After downloading make sure that you add OOPSAT to your MATLAB path (recommended to add it to the bottom of your path list).
 
 PSAT can be downloaded from [http://faraday1.ucd.ie/psat.html](http://faraday1.ucd.ie/psat.html)
 however some custom changes/local fixes are added. Consequently, it is recommended
