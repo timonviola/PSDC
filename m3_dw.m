@@ -5,7 +5,7 @@ ACOPF_SEED = [OUT_DIR 'case68_ACOPF_mod.csv'];
 PSAT_FILE = ['case_files' filesep 'd_case68.m'];
 CASE_NAME = 'case68';
 %CASE_FILE = [pwd filesep 'case_files' filesep 'mod_case68.m'];
-CASE_FILE = [pwd filesep 'mod_case68.m'];
+CASE_FILE = [pwd filesep 'case_files' filesep 'int_case68.m'];
 if ~ispc
     util.add_dependencies
 end
@@ -53,6 +53,9 @@ p.addAttachedFiles(CASE_FILE);
 %% TODO: check for duplicates
 
 %% Add first set to data-set
+% Turn off PSDC warning messages to keep the logfile clean
+warning('off','PSDC:DW')
+warning('off','PSDC:SSS:eig')
 % Progressbar that shows on STDOUT
 pw = textBar(N,'Parallel Directed walks');
 parfor i = 1:N
@@ -61,8 +64,8 @@ parfor i = 1:N
         [OUT_DIR 'dw_set_points' CASE_NAME '_' num2str(i) '.csv']);
    increment(pw)
 end
-
-
+warning('on','PSDC:DW')
+warning('on','PSDC:SSS:eig')
 toc(t2)
 delete(pw)
 
