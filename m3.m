@@ -1,3 +1,5 @@
+% Copyright (c) 2020 Timon Viola
+
 % this is more like m5 - after directed walks and sampling we check for everything
 %% SSS, Directed walks
 % Check each setpoint from the previous section. The following criteria has

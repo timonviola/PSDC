@@ -1,3 +1,5 @@
+% Copyright (c) 2020 Timon Viola
+
 % parallel directed walks
 t2 = tic;
 OUT_DIR = '.data/case68_2020_06_23T161833Z/'; % '.data/case39_2020_06_16T103242Z/';

@@ -1,3 +1,5 @@
+% Copyright (c) 2020 Timon Viola
+
 % fit a normal distribution to feasible points
 load('.data/case14_dwg/unified_case14_summary.mat')
 setpoints = readmatrix(".data/case14_dwg/unified_case14.csv","Delimiter",",");

@@ -1,9 +1,6 @@
 %% OOPSAT
 
-
-%% Julia
-
-
+% Copyright (c) 2020 Timon Viola
 
 
 %% PSDC 

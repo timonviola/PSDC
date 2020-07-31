@@ -1,3 +1,5 @@
+% Copyright (c) 2020 Timon Viola
+
 % OUT_DIR, FILE_NAME_SAMPLES, CASE_NAME, from m1 script
 input_file = [OUT_DIR filesep FILE_NAME_SAMPLES];
 case_file = ['case_files' filesep CASE_NAME '.m'];

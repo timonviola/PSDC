@@ -1,5 +1,8 @@
 % SOFTWARE
-% Version 0.1.3 03-Jun-2020
+% Version 1.0.0 31-Jul-2020
+%
+% Copyright (c) 2020 Timon Viola
+%
 % Files
 %   call_julia    - ----- local -----
 %   m1            - 

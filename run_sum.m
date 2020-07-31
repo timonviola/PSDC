@@ -1,3 +1,5 @@
+% Copyright (c) 2020 Timon Viola
+
 OUT_DIR = '.data/case14_dwg/';
 %ACOPF_SEED = [OUT_DIR 'case39_ACOPF.csv'];
 CASE_FILE = 'case_files/case14.m';

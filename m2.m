@@ -1,3 +1,5 @@
+% Copyright (c) 2020 Timon Viola
+
 %% ACOPF checks on samples
 % Run a modified ACOPF on all the samples
 

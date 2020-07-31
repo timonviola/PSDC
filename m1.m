@@ -1,3 +1,5 @@
+% Copyright (c) 2020 Timon Viola
+
 clear
 if ~ispc
     util.add_dependencies
