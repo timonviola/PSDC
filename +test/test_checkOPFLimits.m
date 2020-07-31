@@ -13,7 +13,7 @@ end
 ps = psat('command_line_psat',true,'nosplash',true);
 %% OOPSAT FILE LOAD
 caseFolder = [pwd filesep 'case_files' filesep];
-caseName = 'd_009_dyn';
+caseName = 'd_case9';
 ps.runpsat(['case_files' filesep caseName '.m'],'data');
 %% OOPSAT POWER FLOW
 ps.runpsat('pf')

@@ -19,17 +19,15 @@ fprintf('SUCCESSFUL\n')
 
 % do not display opf message in cmw (e.g.: pf details)
 % ps.clpsat.mesg = 0;
-% % do not reload data file on pf run
-% ps.clpsat.readfile = 0;
+% do not reload data file on pf run
+ps.clpsat.readfile = 0;
 
 %% Load case, power-flow
 caseFolder = [pwd filesep 'case_files' filesep];
-% caseName = 'd_009_dyn';
-caseName = 'd_iceland'; %'d_IEEE68bus';
+
+caseName = 'd_case9';
 fprintf(pad(['Load case ' caseName],50,'right','.'))
-% ps.runpsat(caseName,caseFolder,'/case_files/','data');
-% ps.runpsat(['case_files' filesep caseName '.m'],'data');
-ps.runpsat('psat_tmpcase118.m','data')
+ps.runpsat(['case_files' filesep caseName '.m'],'data');
 fprintf('SUCCESSFUL\n')
 
 fprintf(pad('Run power-flow',50,'right','.'))
@@ -54,3 +52,4 @@ SmallSignalStability.plot.plotStabMargin(0.03);
 
 %% psat cmd print
 ps.powerFlowResults('print')
+
