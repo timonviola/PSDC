@@ -1,5 +1,7 @@
 % Script to test parallel execution of PSAT operations such as power-flow
 % or eigenvalue calculations
+%
+% Copyright (C) 2020 Timon Viola
 
 util.add_dependencies % add PSAT and MATPOWER to path
 

@@ -1,3 +1,7 @@
+% Collection of PSDC tests.
+%
+% Copyright (C) 2020 Timon Viola
+%
 % import matlab.unittest.TestSuite;
 % suite = TestSuite.fromPackage('test')
 % res = run(suite)

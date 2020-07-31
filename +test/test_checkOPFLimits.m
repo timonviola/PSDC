@@ -1,4 +1,7 @@
 % OOPSAT test script
+%
+% Copyright (C) 2020 Timon Viola
+%
 % test the following:
 %   * OOPSAT launch
 %   * OOPSAT file load

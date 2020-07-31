@@ -1,3 +1,6 @@
+%
+% Copyright (C) 2020 Timon Viola
+
 load(['+test' filesep 'debug_const.mat'])
 t2 = tic;
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);

@@ -1,3 +1,7 @@
+% Test OOPSAT eigenvalue computation.
+%
+% Copyright (C) 2020 Timon Viola
+
 N = 20;
 PG = 4;
 PV = 5;

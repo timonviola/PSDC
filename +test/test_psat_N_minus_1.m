@@ -6,6 +6,8 @@
 % * build system matrix A       (PSAT)
 % * calculate eigen properties
 % * plot
+%
+% Copyright (C) 2020 Timon Viola
 
 clear
 

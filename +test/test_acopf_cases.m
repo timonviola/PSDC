@@ -1,4 +1,7 @@
 % Test case that verifies OOPSAT vs MATPOWER results.
+
+% Copyright (C) 2020 Timon Viola
+
 %% Test 39 bus system
 % The datafiles contain equivalent static (power flow) data.
 c39 = 'case_files/case39.m';
