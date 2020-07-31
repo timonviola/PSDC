@@ -7,6 +7,12 @@
 % structure of classDetails is 1 level deeper.
 %%
 function plotDataSummary(setPointsFile, summaryFile)
+if nargin < 2
+    [setPointsFile,path] = uigetfile('*.csv','Select set points file.');
+    setPointsFile = fullfile(path,setPointsFile);
+    [summaryFile,path] = uigetfile('*.mat','Select summary file.');
+    summaryFile = fullfile(path,summaryFile);
+end
 % C:\Users\Timon\OneDrive - Danmarks Tekniske Universitet\Denmark\DTU\2019_20_II\software\
 setpoints =  readmatrix(setPointsFile,"Delimiter",",");
 
@@ -16,8 +22,8 @@ load(summaryFile,'stable','classDetails','dampingRatio') %#ok
 % setpoints = readmatrix(".data\case9_2020_06_08T144804Z\unified_case9.csv","Delimiter",",");
 % load('.data\case9_2020_06_08T144804Z\unified_case9_summary.mat')
 
-%  
-%
+
+
 genReport = false;
 
 idxStablePoints = (stable == 1);
@@ -26,9 +32,8 @@ fprintf('Number of stable points: %d\n',sum(idxStablePoints))
 fprintf('Dataset ratio:\t \t %4.3f%%\n',100 * sum(idxStablePoints)/length(idxStablePoints))
 [stablePointNo,~] = find(idxStablePoints);
 
-% %% which points are close to feasible
-% % feasible = 95
-% feasible = (size(classDetails{1},1))*(size(classDetails{1},2)-1); % automatically sets feasibility limit based on number of contingencies considered
+
+
 n = length(classDetails);
 % x = 1:n;
 y = nan(n,1);
@@ -36,17 +41,7 @@ for i = 1:n
 %     y(i) = sum(sum(classDetails{i}(:,1:5)));
     y(i) = sum(classDetails{i,:});
 end
-% c =[ 3.2*(ones(n,1) - y/feasible),y/feasible, zeros(n,1) ];
-% 
-% figure('Name','Distance from feasibility');
-% axes;
-% hold on
-% scatter(x,y,5,c) %{:}(:,1:5))
-% plot(gca,[100,n],[feasible,feasible],'color','#EDB120','LineStyle',':','LineWidth',2)
-% text(n/2,feasible+2,'Feasibility','color','k')
-% ylim([50,100])
-% xlabel('Data index')
-% ylabel('Distance from feasibility')
+
 
 %% which points are close to feasible - P set sum
 FEASIBLE = 5;
@@ -55,15 +50,16 @@ for i = 1:n
     % TODO: the voltages are also summed - mbe this should change
     x_sp(i) = sum(setpoints(i,:));
 end
+
 fig = figure('Name','Distance from feasibility [setpoints]');
 ax1 = axes(fig,'Position',[.1 .15 .9 .7]);
 hold on
 % title('N-1 feasability vs setpoint sum')
-title('feasibility vs setpoint sum')
+title('Data set summary')
 scatter(ax1,x_sp,y,5,y,'LineWidth',1.5) %{:}(:,1:5))
-colormap(jet)
+colormap(winter(max(y)))
 cb = colorbar;
-plot(gca,ax1.XLim,[FEASIBLE,FEASIBLE],'color','#EDB120','LineStyle','-','LineWidth',1)
+plot(gca,ax1.XLim,[FEASIBLE,FEASIBLE],'color',[0.64,0.08,0.18],'LineStyle','-','LineWidth',1)
 text(mean(ax1.XLim),ax1.YLim(2)+2,'Feasibility','color','k')
 ylim([ax1.YLim(1)-10,ax1.YLim(2)+10])
 % xlabel('Sum P_{G2-G5}')
@@ -98,6 +94,10 @@ fig.Position = [398 286 426 364];
 cb.Position = [0.8903 0.1500 0.0427 0.5963];
 ax1.Position = [0.1000 0.1500 0.7719 0.6988];
 yl.Position = [-13.3537   82.5000   -1.0000];
+
+
+util.printDataSummary(stable,classDetails)
+
 % Note: To export the figure in proper quality go to File>Export Setup>Load
 % > and load myDataSet profile. This profile was set up for this figure.
 
