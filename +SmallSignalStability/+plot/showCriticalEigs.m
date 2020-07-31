@@ -1,3 +1,5 @@
+
+% Copyright (C) 2020 Timon Viola
 function showCriticalEigs(ax,zeta,dr)
 pms = {'Marker','o','MarkerEdgeColor','r','MarkerFaceColor','r',...
     'MarkerFaceAlpha',0.25,'SizeData',50};

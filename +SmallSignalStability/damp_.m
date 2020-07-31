@@ -9,6 +9,7 @@
 %   MATLAB                      (9.8)
 %   Control System Toolbox      (14.0)
 
+% Copyright (C) 2020 Timon Viola
 function varargout = damp_(As)
 
     try

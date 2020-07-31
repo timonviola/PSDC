@@ -1,5 +1,7 @@
+% COMPAREEIGENVALUES(A{}) interactive explorer of eigenvalue evolution.
+
+% Copyright (C) 2020 Timon Viola
 function varargout = compareEigenValues(A_matrices)
-% COMPAREEIGENVALUES(A{}) interactive explorer of eigenvalue evolution
 
 fh = figure;
 ah = axes;

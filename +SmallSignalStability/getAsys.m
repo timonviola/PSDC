@@ -1,4 +1,6 @@
 % DEPRECATED 
+
+% Copyright (C) 2020 Timon Viola
 function Asys = getAsys()
 % GETASYS return system matrix.
 %

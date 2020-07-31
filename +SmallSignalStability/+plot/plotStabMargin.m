@@ -1,5 +1,8 @@
-function varargout=plotStabMargin(limit,varargin)
 % PLOTSTABMARGIN Plot stability margin of damping ration given by LIMIT.
+
+% Copyright (C) 2020 Timon Viola
+function varargout=plotStabMargin(limit,varargin)
+
 
 p = inputParser;
 isInBounds = @(x) abs(x) <= 1;

@@ -1,5 +1,7 @@
-function varargout = eigPlot(lambda,varargin)
 % EIGPLOT Plot the eigenvalues on the ImRe plane
+
+% Copyright (C) 2020 Timon Viola
+function varargout = eigPlot(lambda,varargin)
 
 p = inputParser;
 p.KeepUnmatched = true;

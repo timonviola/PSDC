@@ -1,3 +1,6 @@
+% Set plot tolerance limits.
+
+% Copyright (C) 2020 Timon Viola
 function [zeta,poles] = reduce_num_pole(zeta,poles)
 % Eliminiate pole due to numerical error
 

@@ -1,4 +1,3 @@
-function varargout = checkSmallSignalStability(dr_lim,Asys)
 % CHECKSMALLSIGNALSTABILITY Small signal stability of power system. 
 %
 %   [isStable, dr] = CHECKSMALLSIGNALSTABILITY(DR_LIM,ASYS) checks if the
@@ -6,6 +5,10 @@ function varargout = checkSmallSignalStability(dr_lim,Asys)
 %   true if DR_LIM <= min(zeta). 
 %       DR_LIM -    is the critical damping ratio in absolute value
 %       ASYS   -    is the power system matrix
+
+% Copyright (C) 2020 Timon Viola
+function varargout = checkSmallSignalStability(dr_lim,Asys)
+
 
 % calculate the modal parameters of A matrix:
 %   w_n - undamped natural frequency
