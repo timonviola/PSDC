@@ -1,5 +1,7 @@
-function NEW_DS_POINTS = dwg_f(setPoint, PSAT_FILE, CASE_FILE,varargin)
-
+% Greedy directed walk function considering AC-OPF limits.
+function NEW_DS_POINTS = dwg_f2(setPoint, PSAT_FILE, CASE_FILE,varargin)
+% greedy directed walk function with ACOPF constrained step direction
+% choice.
 
 zetaMinDefault = 0.03;
 printDefault = false;

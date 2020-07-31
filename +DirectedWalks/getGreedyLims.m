@@ -1,8 +1,31 @@
-function [grad,varargout] = getGreedyLims(ps, setPoints, curDR, mmc,alpha_k, varargin)
-% GETSTEPDIR Return the gradient of the new step.
-% calculate SSS for 2*nPG direction of N-dimensional space
-%
+%GETGREEDYLIMS Greedy computation of step direction.
+%   grad = GETGREEDYLIMS(ps, setPoints, currentDR) returns the gradient of
+%   the next directed walk step which has a good-enough distance reduction
+%   only if the step in that direction would not violated ACOPF limits. ps
+%   is an oopsat instance, setPoints is the ordered vector of set points
+%   and currentDR is the current steps damping ratio.
+% 
+%   GETGREEDYLIMS(__,Name,Value) uses additional options specified by one 
+%   or more Name-Value pair arguments. Possible name-value pairs:
+%     o zetaMin - [numeric] define critical damping ratio (default = 0.03)
+%     o print - [logical] Plot the progress of the gradient calculation
+%               (default = false)
+%     o imwrite - Pass cell of image snapshots if a .gif file is going to
+%                 be written from the progress plot.
+% 
+%   Example
+%     
+% 
 % See also DIRECTEDWALKS.DWF
+% 
+
+% Copyright (C) 2020 Timon Viola
+
+
+function [grad,varargout] = getGreedyLims(ps, setPoints, curDR, mmc,...
+    alpha_k, varargin)
+
+
 import DirectedWalks.getDist
 import DirectedWalks.limitsViolated
 
@@ -13,14 +36,18 @@ p = inputParser;
 addRequired(p,'ps')
 addRequired(p,'setPoints')
 addRequired(p,'curDR')
+addRequired(p,'mmc')
+addRequired(p,'alpha_k')
 addOptional(p,'zetaMin',zetaMinDefault,@(x) isnumeric(x))
 addParameter(p,'print',printDefault, @(x)islogical(x))
 addParameter(p,'imwrite',imDefault)
-parse(p,ps,setPoints,curDR,varargin{:})
+parse(p,ps,setPoints,curDR,mmc,alpha_k,varargin{:})
 
 ps = p.Results.ps;
 setPoints = p.Results.setPoints;
 curDR = p.Results.curDR;
+mmc = p.Results.mmc;
+alpha_k = p.Results.alpha_k;
 zetaMin = p.Results.zetaMin;
 PRINT = p.Results.print;
 im = p.Results.imwrite;

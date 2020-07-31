@@ -1,8 +1,26 @@
-function [grad,varargout] = getGreedy(ps, setPoints, curDR, varargin)
-% GETSTEPDIR Return the gradient of the new step.
-% calculate SSS for 2*nPG direction of N-dimensional space
-%
+%GETGREEDY Greedy computation of step direction.
+%   grad = GETGREEDY(ps, setPoints, currentDR) returns the gradient of the
+%   next directed walk step which has a good-enough distance reduction. ps
+%   is an oopsat instance, setPoints is the ordered vector of set points
+%   and currentDR is the current steps damping ratio.
+% 
+%   GETGREEDY(__,Name,Value) uses additional options specified by one 
+%   or more Name-Value pair arguments. Possible name-value pairs:
+%     o zetaMin - [numeric] define critical damping ratio (default = 0.03)
+%     o print - [logical] Plot the progress of the gradient calculation
+%               (default = false)
+%     o imwrite - Pass cell of image snapshots if a .gif file is going to
+%                 be written from the progress plot.
+% 
+%   Example
+%     
+% 
 % See also DIRECTEDWALKS.DWF
+% 
+
+% Copyright (C) 2020 Timon Viola
+function [grad,varargout] = getGreedy(ps, setPoints, curDR, varargin)
+
 import DirectedWalks.getDist
 
 zetaMinDefault = 0.03;

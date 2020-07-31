@@ -1,7 +1,14 @@
-% Check if SP violates min or max PG/VG constraints
+%LIMITSVIOLATED Check PG,VG limit violations.
+%   valid = LIMITSVIOLATED(setpoint,mmc) Checks if setpoint violates min or
+%   max PG and VG constraints defined in mmc MATPOWER struct. Returns
+%   logical true if any of the limits is violated.
 %
-%
+%   Example
+% 
+%   See also DIRECTEDWALKS.DWG, DIRECTEDWALKS.DWG_S
+% 
 
+% Copyright (C) 2020 Timon Viola
 function isViolated = limitsViolated(sp,mmc)
 
 VMAX = 12; VMIN = 13; PMAX = 9; PMIN = 10;

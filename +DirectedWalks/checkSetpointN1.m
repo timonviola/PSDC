@@ -36,19 +36,20 @@
 %   DIRECTEDWALKS.CHECKOPFLIMITS.
 
 % Copyright (C) 2020 Timon Viola
-function varargout = checkSetpoint(setPoints,...
+function varargout = checkSetpointN1(setPoints,...
      psatFName,matpowerFName,varargin)
 % PSAT is initialized inside the function to support parallel excecution.
 
 printOptions = {'print',''};
 printDefault = {};
 zetaMinDefault = 0.03;
-
+contDefault = [];
 p = inputParser;
 addRequired(p,'setPoints',@(x) isnumeric(x))
 addRequired(p,'psatFName')
 addRequired(p,'matpowerFName')
 addOptional(p,'zetaMin',zetaMinDefault , @(x)isnumeric(x))
+addOptional(p,'contingencies',contDefault , @(x)isnumeric(x) && isvector(x))
 addParameter(p,'print',printDefault, @(x) ismember(x,printOptions) || iscell(x))
 parse(p,setPoints,psatFName,matpowerFName,varargin{:})
 
@@ -57,6 +58,7 @@ psatFName = p.Results.psatFName;
 matpowerFName = p.Results.matpowerFName;
 zetaMin = p.Results.zetaMin;
 PRINT = p.Results.print;
+CONTLIST = p.Results.contingencies;
 if ~iscell(PRINT)
     PRINT = {PRINT};
 end
@@ -73,33 +75,51 @@ ps.Settings.pv2pq = 0;
 ps.runpsat(psatFName,'data')
 ps.runpsat('pf') 
 
-
-ps.PVSet(setPoints);
-% run modified pf
-ps.runpsat('pf');
-% power flow results, 'print' option available
-res = ps.powerFlowResults(PRINT{:});
-
-% ----- Optimal Power Flow criteria -----
-[opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
-
-% TODO if failed set ps.Settings.pv2pq = 1; and retry.
-if ~opfStab
-    if any(strcmp(PRINT,'print'))
-        warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
-        'Retry with enforced Q-limits.\nPG QG VM Sf\n' num2str(opfDet)])
-    end    
-    % try with enforced q-limits
-    ps.Settings.pv2pq = 1;
+%%%%%%%%%%%%%%%%%%%%%% START N-1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+line_con_ref = ps.Line.con;
+L_STAT = 16;
+% if no contingency list is passed, check for all line outages
+if isempty(CONTLIST)
+    CONTLIST = 1:ps.Line.n;
+    % include intact case
+    CONTLIST = [0,CONSTLIST];
+end
+N = length(CONTLIST);
+% initialize outputs
+opfStab = nan(N,1);
+sssStab = nan(N,1);
+opfDet = nan(N,4);
+minDR = nan(N,1);
+for i = 1:N
+    tmp_con = line_con_ref;
+    if CONTLIST(i) ~= 0
+        % set current line status to offline
+        tmp_con(CONTLIST(i),L_STAT) = 0;        
+    end
+    % assign new line status to OOPSAT object
+    ps.Line.store = tmp_con;
+    ps.PVSet(setPoints);
     ps.runpsat('pf');
     res = ps.powerFlowResults(PRINT{:});
-    [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
+    % ----- Optimal Power Flow criteria -----
+    [opfStab(i), opfDet(i,:)] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
+    if ~opfStab(i)
+        if any(strcmp(PRINT,'print'))
+            warning('PSCD:OPF:limitviolation',['OPF limits are violated.' ...
+            'Retry with enforced Q-limits.\nPG QG VM Sf\n' num2str(opfDet(i,:))])
+        end    
+        % try with enforced q-limits
+        ps.Settings.pv2pq = 1;
+        ps.runpsat('pf');
+        res = ps.powerFlowResults(PRINT{:});
+        [opfStab(i), opfDet(i,:)] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
+    end
+    % ----- Small Signal Stability -----
+    ps.fm_abcd();
+    [sssStab(i), minDR(i)] =...
+        SmallSignalStability.checkSmallSignalStability(zetaMin,ps.LA.a);
 end
-% ----- Small Signal Stability -----
-ps.fm_abcd();
-[sssStab, minDR] =...
-    SmallSignalStability.checkSmallSignalStability(zetaMin,ps.LA.a);
-% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ----- output -----
 if nargout >= 1
     class = opfStab && sssStab;

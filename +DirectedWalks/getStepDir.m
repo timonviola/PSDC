@@ -1,8 +1,25 @@
-function [grad,varargout] = getStepDir(ps, setPoints, curDR, varargin)
-% GETSTEPDIR Return the gradient of the new step.
-% calculate SSS for 2*nPG direction of N-dimensional space
-%
+%GETSTEPDIR Brute-force computation of step direction.
+%   grad = GETSTEPDIR(ps, setPoints, currentDR) Returns the gradient of the
+%   next directed walk step by evaluating the distance reduction in all
+%   possible directions defined by PG decision variables. 
+% 
+%   GETSTEPDIR(__,Name,Value) uses additional options specified by one 
+%   or more Name-Value pair arguments. Possible name-value pairs:
+%     o zetaMin - [numeric] define critical damping ratio (default = 0.03)
+%     o print - [logical] Plot the progress of the gradient calculation
+%               (default = false)
+%     o imwrite - Pass cell of image snapshots if a .gif file is going to
+%                 be written from the progress plot.
+% 
+%   Example
+%     
+% 
 % See also DIRECTEDWALKS.DWF
+% 
+
+% Copyright (C) 2020 Timon Viola
+function [grad,varargout] = getStepDir(ps, setPoints, curDR, varargin)
+
 import DirectedWalks.getDist
 
 zetaMinDefault = 0.03;

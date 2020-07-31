@@ -1,11 +1,20 @@
+%GETDIST Calculate distance metric.
+%   dist = GETDIST(zeta) Return the scalar euclidean distance between zeta 
+%   and the default critical damping ratio (zetaMin) = 0.03.
+%
+%   GETDIST(__,Name,Value) uses additional options specified by one 
+%   or more Name-Value pair arguments. Possible name-value pairs:
+%     o zetaMin - define the critical damping ratio (default = 0.03)
+%
+%   Example
+%     import DirectedWalks.getDist
+%     getDist(0.03,'zetaMin',0.015)
+%
+%   See also DIRECTEDWALKS.DWF
+%
+
+% Copyright (C) 2020 Timon Viola
 function dist = getDist(currentZeta,varargin)
-% GETDIST(zeta) Retrun the scalar eucledian distance between zeta and the
-% default zetaMin = 0.03.
-%
-% GETDIST(zeta, zetaMin) Retrun the scalar eucledian distance between zeta 
-% and zetaMin.
-%
-% See also DIRECTEDWALKS.DWF
 
 zetaMinDefault = 0.03;
 p = inputParser;

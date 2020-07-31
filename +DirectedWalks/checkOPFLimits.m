@@ -7,14 +7,17 @@
 %     o Vbus bus voltage magnitude
 %     o S branch flows
 %
-%  CHECKOPFLIMITS(__,'print) print min,max limits and values to STDOUT
+%  CHECKOPFLIMITS(__,'print') print min,max limits and values to STDOUT
 %
 %   Input arguments:
 %     o case [string,file=*.m] matpower case file that contains limits data
 %     o powerFlowResults [psat] psat object with solved pf data
 %
+%   Example
+% 
 %   See also SMALLSIGNALSTABILITY.CHECKSMALLSIGNALSTABILITY.
 
+% Copyright (C) 2020 Timon Viola
 function varargout = checkOPFLimits(matpowerCase, powerFlowResults, varargin)
 % Inspired by MATPOWER CHECKLIMITS utility function:
 % https://matpower.org/docs/ref/matpower7.0/extras/misc/checklimits.html

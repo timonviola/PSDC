@@ -1,10 +1,22 @@
-function alpha = getAlpha(MPC,varargin)
-% GETALPHA(MPC) Return alpha discretization ratio. In each dimension alpha
-% is 1% of the corresponding decision variable's range from MPC.
-% GETALPHA(MPC,scale) Return alpha as each element is scale% of the
-% decision variables range (must be positive).
+%GETALPHA Compute the discretization factor.
+%   df = GETALPHA(MPC) Return alpha discretization factor. In each dimension
+%   alpha is 1% of the corresponding decision variable's min-max range. The
+%   range is extracted from the MPC MATPOWER struct.
+% 
+%   GETALPHA(__,Name,Value) uses additional options specified by one or more 
+%   Name-Value pair arguments. Possible name-value pairs:
+%     o alphaScale - scaling factor of 1% of the decision variables range.
+% 
+%   Example
+%     import DirectedWalks.getAlpha
+%     mmc = loadcase('case_files/case14.m');
+%     getAlpha(mmc)
+% 
+%   See also DIRECTEDWALKS.DWF
 %
-% See also DIRECTEDWALKS.DWF
+
+% Copyright (C) 2020 Timon Viola
+function alpha = getAlpha(MPC,varargin)
 
 alphaScaleDefault = 1;
 p = inputParser;
