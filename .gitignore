@@ -7,6 +7,7 @@ ERROR*
 output*
 out_*.txt
 fm_call.m
+tmp*
 
 .log/
 .data/
