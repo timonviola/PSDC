@@ -1,3 +1,7 @@
+% Plot volume comparision results.
+
+% Copyright (C) 2020 Timon Viola
+
 function plotVolumeComp()
 % PLOTVOLUMECOMP Plot the results of volume_cmp.r .
 f = figure('name','PSDC','NumberTitle','off');

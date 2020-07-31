@@ -1,5 +1,8 @@
 % +UTIL
-% Version 1.0.0 10-Jul-2020
+% Version 1.0.0 31-Jul-2020
+%
+% Copyright (C) 2020 Timon Viola
+%
 % Files
 %   add_dependencies  - HPC only - add dependencies to MATLAB path.
 %   dataSummary       - Checks all setpoints defined and saves the results.
@@ -11,5 +14,3 @@
 %   printRawACOPF     - 
 %   printTableContent - Print formatted ASCII table contents.
 %   psatSilent        - initialize PSAT
-
-%   Copyright 2020 Timon Viola

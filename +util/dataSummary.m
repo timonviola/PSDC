@@ -8,6 +8,7 @@
 %
 % See also UTIL.PRINTDATASUMMARY 
 
+% Copyright (C) 2020 Timon Viola
 function dataSummary(setPointsCsv,psatFile,mpFile,varargin)
 t = tic;
 % readTVars = false;

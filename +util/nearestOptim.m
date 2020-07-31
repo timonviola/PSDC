@@ -1,5 +1,6 @@
 % Return closest ACOPF feasible setpoints to input set_points
 
+% Copyright (C) 2020 Timon Viola
 function optimalSetpoint = nearestOptim(mpc,setPoint)
 
 % TOL = 1;

@@ -1,4 +1,6 @@
-% initialize PSAT
+% Initialize PSAT with all messages surpresssed.
+
+% Copyright (C) 2020 Timon Viola
 ps = psat('command_line_psat',true,'nosplash',true);
 
 % do not reload data file on pf run

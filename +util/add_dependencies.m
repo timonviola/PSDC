@@ -1,4 +1,6 @@
 % HPC only - add dependencies to MATLAB path.
+%
+% Copyright (C) 2020 Timon Viola
 
 % matpower
 addpath(genpath('~/thesis/matpower6.0/'))

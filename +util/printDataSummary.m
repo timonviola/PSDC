@@ -1,6 +1,8 @@
-function printDataSummary(stable, classDetails)
 % PRINTDATASUMMARY Formatted output of plotDataSummary.
 % See also UTIL.PLOTDATASUMMARY
+
+% Copyright (C) 2020 Timon Viola
+function printDataSummary(stable, classDetails)
 
 fprintf('\n<strong>Summary</strong>\n')
 fprintf(pad('',25,'right','-'))

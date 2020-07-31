@@ -1,3 +1,5 @@
+% Copyright (C) 2020 Timon Viola
+
 load +test\debug_const.mat
 acopfResults = readtable(ACOPF_SEED, 'ReadVariableNames',true);
 acopfResults = acopfResults(:,sort(acopfResults.Properties.VariableNames));

@@ -5,7 +5,9 @@
 
 % Most of this script is written for N-1 analysis which means that the
 % structure of classDetails is 1 level deeper.
-%%
+%
+
+% Copyright (C) 2020 Timon Viola
 function plotDataSummary(setPointsFile, summaryFile)
 if nargin < 2
     [setPointsFile,path] = uigetfile('*.csv','Select set points file.');

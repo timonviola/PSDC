@@ -1,4 +1,7 @@
-% PRINTHEADER Print ASCII table header.
+% PRINTDATASUMMARY Formatted output of plotDataSummary.
+% See also UTIL.PLOTDATASUMMARY
+
+% Copyright (C) 2020 Timon Viola
 function printHeader(varargin)
 if nargin > 2
    tFormat = varargin{3};
