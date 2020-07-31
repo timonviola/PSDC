@@ -1,3 +1,6 @@
+% Initialize DW plot.
+
+% Copyright (C) 2020 Timon Viola
 function varargout = plotDWInit(varargin)
 
 p = inputParser;

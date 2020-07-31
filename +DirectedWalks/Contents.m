@@ -1,5 +1,5 @@
 % +DIRECTEDWALKS
-% Version 1.0.0 10-Jul-2020
+% Version 1.0.0 31-Jul-2020
 %
 % Copyright 2020 Timon Viola
 %

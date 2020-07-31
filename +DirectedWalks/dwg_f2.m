@@ -1,4 +1,6 @@
 % Greedy directed walk function considering AC-OPF limits.
+
+% Copyright (c) 2020 Timon Viola
 function NEW_DS_POINTS = dwg_f2(setPoint, PSAT_FILE, CASE_FILE,varargin)
 % greedy directed walk function with ACOPF constrained step direction
 % choice.

@@ -1,3 +1,6 @@
+% Return green dot styling.
+
+% Copyright (C) 2020 Timon Viola
 function prop=greenProps()
 prop = {...
     'Color', [1 0 0],...

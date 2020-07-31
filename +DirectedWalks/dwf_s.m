@@ -1,3 +1,5 @@
+% Copyright (c) 2020 Timon Viola
+
 % DWF_S Development implementation of brute force directed walk algorithm.
 % DWF_S is a heavily modified version of the core algorithm that has
 % multiple break hooks in case of a stuck descent.

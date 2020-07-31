@@ -1,3 +1,6 @@
+% Return unfeasible point styling.
+
+% Copyright (C) 2020 Timon Viola
 function prop = unfeasibleProps()
 prop = {...
     'Color', [1 0 0],...

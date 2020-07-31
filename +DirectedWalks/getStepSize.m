@@ -1,4 +1,3 @@
-function step = getStepSize(dist,PMAX,varargin)
 % GETSTEPSIZE(dist,PMAX) Return the current step size vector based on the
 % eucledian distance dist from the desired target. The step size vector is
 % a ratio of the PMAX vector.
@@ -17,6 +16,9 @@ function step = getStepSize(dist,PMAX,varargin)
 % E_4 = 0.0025;
 %
 % See also DIRECTEDWALKS.DWF
+
+% Copyright (c) 2020 Timon Viola
+function step = getStepSize(dist,PMAX,varargin)
 
 % CONSTANTS
 % step related constants

@@ -1,3 +1,6 @@
+% Add time elapsed text box to DW plot.
+
+% Copyright (C) 2020 Timon Viola
 function [objH,t] = addTimeElapsedBox(fig)
 t = tic;
 elapsedTime = util.getTimeElapsed(t);

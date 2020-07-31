@@ -1,4 +1,5 @@
 % Directed walk algorithm specification.
+%
 % From: Efficient Database Generation for Data-driven
 %       Security Assessment of Power Systems
 %
@@ -54,3 +55,5 @@
 % zeta      - damping ratio (small signal stability)
 % G         - number of generators as decision variables (slack excluded)
 % K_max     - maximum number of steps
+%
+% Copyright (c) 2020 Timon Viola

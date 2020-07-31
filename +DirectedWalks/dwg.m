@@ -35,3 +35,4 @@
 %       is larger than R the current subprocess backpropagates to another 
 %       direction. This serves as a stopping criterion.
 %
+% Copyright (c) 2020 Timon Viola

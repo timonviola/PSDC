@@ -1,4 +1,6 @@
 % PLOTDWUPDATE update directed walk progress plot
+
+% Copyright (C) 2020 Timon Viola
 function gObj = plotDwUpdate(ax,i,DR,prop,setPoints)
 gObj = plot(ax,DR,i,prop{:});
 drawnow;

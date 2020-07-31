@@ -1,4 +1,6 @@
 % Greedy directed walk function implementation.
+
+% Copyright (c) 2020 Timon Viola
 function NEW_DS_POINTS = dwg_f(setPoint, PSAT_FILE, CASE_FILE,varargin)
 
 

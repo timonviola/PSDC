@@ -1,3 +1,6 @@
+% Return probe plot styling.
+
+% Copyright (C) 2020 Timon Viola
 function props = probeProps()
 props = {...
     'Color', [1 0 0],...

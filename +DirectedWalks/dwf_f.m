@@ -1,3 +1,6 @@
+% Brute-force directed walk function.
+
+% Copyright (c) 2020 Timon Viola
 function NEW_DS_POINTS = dwf_f(setPoint, PSAT_FILE, CASE_FILE,varargin)
 % DWF_F Directed walk function.
 % See also DIRECTEDWALKS.DWF
