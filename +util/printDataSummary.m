@@ -13,6 +13,10 @@ critNames = ["PG","QG","VM","Sf","SSS"];
 
 disp('Stability per criterion')
 sPercentage = sum(cell2mat(classDetails),1)./length(stable) *100;
+if isempty(sPercentage)
+    sPercentage = zeros(size(critNames,2),1);
+end
+
 for i = 1:length(critNames)
     fprintf('%11s\t%30.2f%%\n',critNames(i),sPercentage(i))
 end

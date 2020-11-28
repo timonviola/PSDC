@@ -81,8 +81,8 @@ ps.runpsat('pf');
 res = ps.powerFlowResults(PRINT{:});
 
 % ----- Optimal Power Flow criteria -----
-%[opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
-[opfStab, opfDet] = DirectedWalks.checkOPFLimitsMTPW(loadedCase,setPoints);
+[opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
+% [opfStab, opfDet] = DirectedWalks.checkOPFLimitsMTPW(loadedCase,setPoints);
 
 % TODO if failed set ps.Settings.pv2pq = 1; and retry.
 if ~opfStab
@@ -94,8 +94,8 @@ if ~opfStab
     ps.Settings.pv2pq = 1;
     ps.runpsat('pf');
     res = ps.powerFlowResults(PRINT{:});
-%     [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
-    [opfStab, opfDet] = DirectedWalks.checkOPFLimitsMTPW(loadedCase,setPoints);
+    [opfStab, opfDet] = DirectedWalks.checkOPFLimits(loadedCase,res,PRINT{:});
+%     [opfStab, opfDet] = DirectedWalks.checkOPFLimitsMTPW(loadedCase,setPoints);
 end
 % ----- Small Signal Stability -----
 ps.fm_abcd();

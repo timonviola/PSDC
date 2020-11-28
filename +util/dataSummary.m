@@ -123,8 +123,10 @@ try
     end
     fprintf('Summay is saved as: %s\n',fSaveName)
     save(fSaveName,'stable','classDetails','dampingRatio')
-catch
+catch ME
    fprintf('Error - trying to save what we can\n')
+   fprintf('<strong>%s</strong>\n',ME.identifier)
+   fprintf('\t%s\n\n',ME.message)
    save('error_summary.mat','stable','classDetails','dampingRatio')
 end
 %% print
